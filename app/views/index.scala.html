@@ -1,0 +1,88 @@
+@(clusters:Traversable[hiv24.Cluster], 
+clusterForm:Form[hiv24.Cluster],
+geneInputForm:Form[Tuple2[String,Option[String]]],
+queryForm:Form[Option[String]])
+
+@import views.html.helper._
+
+@implicitField = @{ FieldConstructor(fieldConstructor.f) }
+
+
+@main("Welcome") {
+
+<header class="subhead">
+<div class="row"> 
+<div class="span8">
+
+<h1>Patterns of Expression and Analysis of Clusters of HIV/Host interactions
+</h1>
+</div>
+<div class="span4">
+<img src="@routes.Assets.at("images/peach.jpg")" >
+</div>
+<p class="lead">This resource allows the querying of cellullar responses to HIV infection.
+</p>
+
+
+<p>
+The infected cell (SupT1 T cell) was subject of universal infection with a HIV-based vector (HIV-NL43&Delta;env/eGFP, VSV-g pseudotyped). Over 24h, the study recovered cellular transcriptome (mRNA, miRNA), viral life cycle intermediates (reverse transcription, integration, transcription, translation, and release), and integration site distribution.
+</p>
+<p>
+The temporal patterns of the viral life cycle were used to explain the host genome-wide expression dynamics in response to the invading virus.
+</p>
+</header>
+    
+<section>
+  <div class="row">
+    <div class="span4">
+      @form(routes.Application.showClusterFromForm, 'class->"form-inline") {
+          <fieldset>
+          <legend>Look up a cluster</legend>
+          @select(clusterForm("clusterID"),clusters.map(x => (x.id.toString,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+
+          <span class="help-block">The cluster code characters ‘+’ and ‘−’ mark significant upregulation and downregulation, respectively, while ‘o’  indicates no significant deviation from zero.</small>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+          </fieldset>
+          
+      }
+    </div>
+
+    <div class="span4">
+     @form(routes.Application.listGenesFromForm, 'class->"form-inline") {
+      <fieldset>    
+              <legend>Search a custom set of genes</legend>
+
+      @textarea(geneInputForm("idList"), '_label->"",'placeholder->"List of genes (HGNC Gene Symbol or Ensembl Gene ID). miRNA names should be noted as: hsa-mir-[number] (eg. hsa-mir-29a)",'class->"input-xlarge", 'cols -> "20", 'rows -> "10" )
+
+                <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+      </fieldset>
+
+
+     }
+    </div>
+
+    <div class="span4">
+    <legend>Browse the predefined gene sets and pathways (Keggs, GO, Reactome, HIV collections)
+</legend>
+
+     @views.html.filterForm(queryForm)
+
+    </div>
+       
+  </div>
+</section>
+
+ 
+
+   
+
+   
+ 
+   
+    
+}

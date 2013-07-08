@@ -1,0 +1,59 @@
+@(genes: Traversable[hiv24.Gene], imageB64: String, geneInputForm:Form[Tuple2[String,Option[String]]])
+
+@import hiv24._
+
+@import views.html.helper._
+@implicitField = @{ FieldConstructor(fieldConstructor.f) }
+
+<div style="margin-bottom:20px">
+<h6>Gene expression pattern</h1>
+
+<img src="data:image/png;base64,@imageB64">
+
+<small style="color:#666;"><b>Figure:</b> Temporal expression patterns were grouped into clusters with differential expression profiles at
+three phases of the viral life cycle, namely reverse transcription, integration, and late phase.
+Boxplots on the left show the distribution of the normalized regression weights for each viral phase used in clustering.
+Expression change pattern of each gene over time is plotted for mock and HIV samples (dotted orange lines) along with the cluster median (bold red line).</small>
+
+</div>
+
+
+
+
+   <h6>List of genes</h1>
+   @form(routes.Application.listGenesFromForm) {
+
+   <div style="display:none;">
+    @inputText(geneInputForm("format"))
+    
+@inputText(geneInputForm("idList"))
+    
+    </div>
+    <div class="pull-right" style="margin-bottom:2px">
+    <i class="icon-download"></i>
+    <input type="submit" class="btn btn-primary" value="Get table as CSV">
+    </div>
+
+   }
+
+ <table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Ensembl ID</th>
+      <th>Name</th>      
+      <th>Cluster</th>      
+    </tr>
+  </thead>
+  <tbody>
+  	@genes.toSeq.sortBy(_.name).map { gene =>
+    <tr>
+      <td><a href="@routes.Application.listGenes(gene.name)">@gene.ensembleId</a></td>
+      <td><a href="@routes.Application.listGenes(gene.name)">@gene.name</a></td>
+      <td>
+        <a href="@routes.Application.showCluster(gene.cluster.id)">@gene.cluster.name</a>
+      </td>      
+    </tr>
+}
+  </tbody>
+</table>
+

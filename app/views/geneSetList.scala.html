@@ -1,0 +1,39 @@
+@(geneSets:Map[String,Tuple2[hiv24.GeneSet,Traversable[Tuple2[hiv24.Cluster, hiv24.EnrichmentResult]]]], queryForm:Form[Option[String]])
+
+@import hiv24._
+@import views.html.helper._
+@implicitField = @{ FieldConstructor(fieldConstructor.f) }
+
+@main("Predefined gene classes") {
+
+
+
+    
+ @views.html.filterForm(queryForm)
+
+<table class="table table-condensed">
+  <thead>
+    <tr>
+      <th>Gene classes</th>
+      <th>Enriched clusters</th>
+    </tr>
+  </thead>
+  <tbody>
+  @geneSets.toSeq.sortBy(_._1).map{ tup =>
+	
+	<tr>
+      <td><a href="@routes.Application.showGeneSet(java.net.URLEncoder.encode(tup._1,"utf-8"))">@tup._1</a></td>      
+      <td>
+        <span class="badge @(if(tup._2._2.size > 0) "badge-important") ">@tup._2._2.size</span>
+      </td>
+    </tr>
+
+}
+    
+  </tbody>
+</table>
+
+
+
+    
+}

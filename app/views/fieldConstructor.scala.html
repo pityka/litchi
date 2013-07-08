@@ -1,0 +1,15 @@
+@(elements: helper.FieldElements)
+
+<div class="control-group @if(elements.hasErrors) {"error"}">
+    <label for="@elements.id" class="control-label">@elements.label</label>
+    <div class="controls">
+        @elements.input
+        <span class="help-inline">@elements.errors.mkString(", ")</span>
+        @if(elements.args.get('_showConstraints) == Some("true")) {
+        <span class="help-inline">@elements.infos.mkString(", ")</span> 
+        }
+        @if(elements.args.get('_blockHelp).isDefined) {
+        <p class="help-block">@elements.args.get('_blockHelp).get</p> 
+        }
+    </div>
+</div>
