@@ -24,15 +24,15 @@ object ApplicationBuild extends Build {
     resolvers +=   "Twitter" at "http://maven.twttr.com/",
     credentials += {
       val credsFile = (Path.userHome / ".ivy2" / ".credentials")
-      val c = (if (credsFile.exists) Credentials(credsFile)
+      (if (credsFile.exists) Credentials(credsFile)
        else {
         val username = System.getenv("CLOUDBEES_USER")
         val password = System.getenv("CLOUDBEES_PSW")
         val host = System.getenv("CLOUDBEES_HOST")
-        val realm = System.getenv("CLOUDBEES_REALM")        
+        val realm = System.getenv("CLOUDBEES_REALM") 
+        println(host)
+        println(realm)       
         Credentials(realm,host,username,password)})
-      println(c)
-      c
     }
           
     )
