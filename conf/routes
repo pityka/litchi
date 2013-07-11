@@ -6,24 +6,24 @@
 GET     /                           controllers.Application.index
 
 # Show a predefined geneset
-GET 	/geneset/:name			controllers.Application.showGeneSet(name: String)
-GET 	/listgeneset			controllers.Application.showAllGeneSets
+GET 	/geneset/:name			controllers.ClusterController.showGeneSet(name: String)
+GET 	/listgeneset			controllers.GenesController.showAllGeneSets
 
-GET 	/listgenesets/:text			controllers.Application.listGeneSets(text:String)
-POST	/listgenesets 				controllers.Application.queryGeneSets
+#GET 	/listgenesets/:text			controllers.Application.listGeneSets(text:String)
+GET	/listgenesets 				controllers.GenesController.queryGeneSets
 
 # Get list of genes
-GET     /genes/:list              controllers.Application.listGenes(list: String)
-POST	/genes 						controllers.Application.listGenesFromForm
+GET     /genes/:list/activators/:activator              controllers.GenesController.listGenes(list: String,activator:String)
+GET	/genes 						controllers.GenesController.listGenesFromForm
 
 # Show a cluster
-GET 	/cluster/:id 			controllers.Application.showCluster(id: Int)
-GET 	/cluster 				controllers.Application.showClusterFromForm
+GET 	/cluster/:id 			controllers.ClusterController.showCluster(id: String)
+GET 	/cluster 				controllers.ClusterController.showClusterFromForm
 
 GET /about							controllers.Application.about
 
 HEAD /ping						controllers.Application.ping
-GET /ping						controllers.Application.ping
+#GET /ping						controllers.Application.ping
 
 
 # Map static resources from the /public folder to the /assets URL path

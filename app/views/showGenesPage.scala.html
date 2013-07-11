@@ -1,11 +1,11 @@
-@(genes: Traversable[hiv24.Gene],
+@(genes: Traversable[leachi.Gene],
  imageB64: Option[String],
-  enrichmentPerCluster: Traversable[Tuple2[hiv24.Cluster,
-  Traversable[Tuple2[hiv24.GeneSet,hiv24.EnrichmentResult]]]],
-enrichmentPerGeneSet: Traversable[Tuple2[hiv24.GeneSet,Traversable[Tuple2[hiv24.Cluster,hiv24.EnrichmentResult]]]],
-form: Form[Tuple2[String,Option[String]]])
+ name:String,
+  enrichments: Vector[leachi.EnrichmentResult],
+form: Form[Tuple2[String,Option[String]]],
+formtarget:play.api.mvc.Call)
 
-@import hiv24._
+@import leachi._
 
 @main("Show Genes") {
 
@@ -23,22 +23,20 @@ form: Form[Tuple2[String,Option[String]]])
 
 <div class="tab-pane @(if (!imageB64.isDefined) "active" else "" )" id="enrichment">
 
-@enrichmentPerCluster.map{ enrch =>
 
-@views.html.renderClusterEnrichment(enrch)
-
+@if(enrichments.size>0){
+	@views.html.renderEnrichment(name,enrichments)	
 }
 
-@enrichmentPerGeneSet.map{ enrch =>
 
-@views.html.renderGeneSetEnrichment(enrch)
 
-}
+
+
 </div>
 
 @imageB64.map{ image =>
 <div class="tab-pane @(if (imageB64.isDefined) "active" else "" )" id="expr">  
-@views.html.renderGenes(genes,image,form)
+@views.html.renderGenes(genes,image,form,formtarget)
 </div>
 }
 

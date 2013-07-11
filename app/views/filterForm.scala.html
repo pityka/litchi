@@ -1,16 +1,16 @@
 @(queryForm:Form[Option[String]])
 
 
-@import hiv24._
+@import leachi._
 @import views.html.helper._
 @implicitField = @{ FieldConstructor(fieldConstructor.f) }
 
- @form(routes.Application.queryGeneSets, 'class -> "form-inline") {
+ @form(routes.GenesController.queryGeneSets, 'class -> "form-inline") {
 
         <fieldset>
         @inputText(queryForm("keywords"), '_label -> "To see the whole list, just click the browse button", 'placeholder ->"type a keyword to filter") 
         <div class="form-actions">
-        <input type="submit" value="Browse" class="btn btn-primary form-inline" href="@routes.Application.showAllGeneSets"> 
+        <input type="submit" value="Browse" class="btn btn-primary form-inline" href="@routes.GenesController.showAllGeneSets"> 
     	</div>
         </fieldset>       
 

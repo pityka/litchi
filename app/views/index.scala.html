@@ -1,6 +1,6 @@
-@(clusters:Traversable[hiv24.Cluster], 
-clusterForm:Form[hiv24.Cluster],
-geneInputForm:Form[Tuple2[String,Option[String]]],
+@(clusters:Traversable[leachi.GeneSet], 
+clusterForm:Form[Tuple2[String,Option[String]]],
+geneInputForm:Form[leachi.GeneFormObject],
 queryForm:Form[Option[String]])
 
 @import views.html.helper._
@@ -14,33 +14,30 @@ queryForm:Form[Option[String]])
 <div class="row"> 
 <div class="span8">
 
-<h1>Patterns of Expression and Analysis of Clusters of HIV/Host interactions
+<h1>Latent Infection of T Cells by HIV
 </h1>
 </div>
 <div class="span4">
-<img src="@routes.Assets.at("images/peach.jpg")" >
+<img src="@routes.Assets.at("images/litchi.jpg")" >
 </div>
-<p class="lead">This resource allows the querying of cellullar responses to HIV infection.
+<p class="lead">This resource allows the querying of cellular responses during HIV latency and reactivation.
 </p>
 
 
 <p>
-The infected cell (SupT1 T cell) was subject of universal infection with a HIV-based vector (HIV-NL43&Delta;env/eGFP, VSV-g pseudotyped). Over 24h, the study recovered cellular transcriptome (mRNA, miRNA), viral life cycle intermediates (reverse transcription, integration, transcription, translation, and release), and integration site distribution.
-</p>
-<p>
-The temporal patterns of the viral life cycle were used to explain the host genome-wide expression dynamics in response to the invading virus.
+Primary CD4+ T cells from healthy blood donors were obtained by negative selection and magnetic separation. Cells were activated using CD3/CD28 co-stimulation in presence of IL-2. Three days post-stimulation, cells were infected with an HIV-based vector (NL4-3-&Delta;6-drEGFP/CXCR4). Forty-eight hours post-infection, cells were sorted by FACS according to GFP expression. Establishment of HIV latency was carried out on an H80 feeder cell layer. After 10 weeks, reactivation of viral transcription used pharmacological (SAHA, 5’-azacytidine, disulfiram) and immunological agents (IL-7, anti-CD3/anti-CD28 antibodies plus IL-2). Cells were analyzed for GFP expression by FACS and for transcriptome composition by RNA-Seq.
 </p>
 </header>
     
 <section>
   <div class="row">
     <div class="span4">
-      @form(routes.Application.showClusterFromForm, 'class->"form-inline") {
+      @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
           <fieldset>
-          <legend>Look up a cluster</legend>
-          @select(clusterForm("clusterID"),clusters.map(x => (x.id.toString,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+          <legend>Compare conditions</legend>
+          @select(clusterForm("clusterName"),clusters.map(x => (x.name,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
 
-          <span class="help-block">The cluster code characters ‘+’ and ‘−’ mark significant upregulation and downregulation, respectively, while ‘o’  indicates no significant deviation from zero.</small>
+          <span class="help-block">Paired gene expression tests generates sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
           
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -51,11 +48,11 @@ The temporal patterns of the viral life cycle were used to explain the host geno
     </div>
 
     <div class="span4">
-     @form(routes.Application.listGenesFromForm, 'class->"form-inline") {
+     @form(routes.GenesController.listGenesFromForm, 'class->"form-inline") {
       <fieldset>    
               <legend>Search a custom set of genes</legend>
 
-      @textarea(geneInputForm("idList"), '_label->"",'placeholder->"List of genes (HGNC Gene Symbol or Ensembl Gene ID). miRNA names should be noted as: hsa-mir-[number] (eg. hsa-mir-29a)",'class->"input-xlarge", 'cols -> "20", 'rows -> "10" )
+      @textarea(geneInputForm("idList"), '_label->"",'placeholder->"List of genes (HGNC Gene Symbol). miRNA names should be noted as: hsa-mir-[number] (eg. hsa-mir-29a)",'class->"input-xlarge", 'cols -> "20", 'rows -> "10" )
 
                 <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>

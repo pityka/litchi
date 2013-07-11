@@ -2,60 +2,51 @@ package models
 
 import play.api.Play.current
 import scala.io.Source
-import hiv24._
+import leachi._
 import java.io.File
 import mybiotools._
 
 object GeneData {
 
-  private val nameFile = Source.fromURL(getClass.getResource( current.configuration.getString( "hiv24.geneNamesFile" ).get ))
+  private val expressionsFile = Source.fromURL(getClass.getResource(current.configuration.getString("leachi.geneExpressionsFile").get))
 
-  private val expressionsFile = Source.fromURL(getClass.getResource( current.configuration.getString( "hiv24.geneExpressionsFile" ).get ))
+  private val clustersFile = Source.fromURL(getClass.getResource(current.configuration.getString("leachi.clusterListFile").get))
 
-  private val clustersFile = Source.fromURL( getClass.getResource(current.configuration.getString( "hiv24.clustersFile" ).get ))
+  private val enrichmentTestsFiles = play.api.Configuration.unapply(current.configuration).get.getStringList("leachi.enrichmentTestsFiles").toArray.toList.asInstanceOf[List[String]].map { x =>
+    x -> Source.fromURL(getClass.getResource(x))
+  }
 
-  private val enrichmentTestsFiles = play.api.Configuration.unapply( current.configuration ).get.getStringList( "hiv24.enrichmentTestsFiles" ).toArray.toList.asInstanceOf[List[String]].map{ x => 
-    play.api.Logger.info("Reading "+x)
-    Source.fromURL(getClass.getResource( x) ) 
-    } 
+  private val geneSetFiles = play.api.Configuration.unapply(current.configuration).get.getStringList("leachi.predefinedGeneSets").toArray.toList.asInstanceOf[List[String]].map { x =>
+    x -> Source.fromURL(getClass.getResource(x))
+  }
 
-  private val geneSetFiles = play.api.Configuration.unapply( current.configuration ).get.getStringList( "hiv24.predefinedGeneSets" ).toArray.toList.asInstanceOf[List[String]].map{ x => 
-    play.api.Logger.info("Reading "+x)
-     x -> Source.fromURL(getClass.getResource( x) ) 
-    } 
+  val clusters: Vector[GeneSet] = readClusterFiles(clustersFile.getLines.map { file =>
 
-  private val clusterNameFile = Source.fromURL( getClass.getResource(current.configuration.getString( "hiv24.clusterNameFile" ).get ))
+    file -> Source.fromURL(getClass.getResource("/inputfiles/Clusters/" + file))
+  }.toMap)
 
-  private val tmptup = readNameExpressionClusterFiles( nameFile, expressionsFile, clustersFile, clusterNameFile )
+  val expressions: Vector[GeneExpression] = readExpressionFile(expressionsFile)
 
-  val genes = tmptup._1
+  val expressionsByGene: Map[Gene, Vector[GeneExpression]] = expressions.groupBy(_.gene).toMap
 
-  val metaClusters = tmptup._2
+  val genes = expressions.map(_.gene).distinct
 
-  val genesByCluster : Map[Cluster,Set[Gene]] = metaClusters.map{ t =>
-    t._1 -> t._2.map{ cluster =>
-      genes.filter(_.cluster == cluster).toSet
-    }.reduce(_ ++ _)
-  }.toMap
+  def genesByCluster(cl: GeneSet) = cl.set
 
-  val predefinedGeneSets: Map[String, GeneSet] = geneSetFiles.map { x =>
+  val predefinedGeneSets: Vector[GeneSet] = geneSetFiles.flatMap { x =>
     val geneSetFile = x._2
-    val dbname = new File( x._1 ).getName
-    readGeneSets( geneSetFile, genes, dbname )
-  }.flatten.groupBy( _.name ).mapValues( _.head )
+    val dbname = new File(x._1).getName
+    readGeneSets(geneSetFile, dbname)
+  }.toVector
 
-  private val clusterNamesAndOrder : Map[Int,Tuple2[String,Int]] = 
-    readTableAsMap[Int]( 
-      Source.fromURL( getClass.getResource(current.configuration.getString( "hiv24.clusterNameFile" ).get )),
-      key = 'Cluster_ID,
-      sep = "\\t+" )( _.toInt)
-        .mapValues(x => (x('Cluster_Name),x('DisplayOrder).toInt))
+  val enrichmentTests: Vector[EnrichmentResult] = enrichmentTestsFiles.map(x => readEnrichmentFile(x._2, new File(x._1).getName, clusters, predefinedGeneSets)).reduce(_ ++ _)
 
-  val clusterNames = clusterNamesAndOrder.mapValues(_._1)
-  val clusterDisplayOrder = clusterNamesAndOrder.mapValues(_._2)
+  val enrichmentTestsByClusterName: Map[String, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.cluster.name).toMap
 
-    val enrichmentTests: Map[Tuple2[Cluster, String], EnrichmentResult] = enrichmentTestsFiles.map(readEnrichmentFile(_,clusterNames)).reduce(_ ++ _)
+  val enrichmentTestsByGeneSetName: Map[String, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.predefinedSet.name).toMap
 
+  val geneSetsByName: Map[String, GeneSet] = (clusters ++ predefinedGeneSets).map(x => x.name -> x).toMap
 
+  val clusterByGene: Map[Gene, Set[GeneSet]] = clusters.map(cl => cl.set.map(g => g -> Set(cl)).toMap).reduce((x, y) => mybiotools.addMaps(x, y)(_ ++ _))
 
 }

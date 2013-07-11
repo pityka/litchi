@@ -1,6 +1,7 @@
-@(geneSets:Map[String,Tuple2[hiv24.GeneSet,Traversable[Tuple2[hiv24.Cluster, hiv24.EnrichmentResult]]]], queryForm:Form[Option[String]])
+@(geneSets:Vector[(leachi.GeneSet,Vector[leachi.EnrichmentResult])],
+ queryForm:Form[Option[String]])
 
-@import hiv24._
+@import leachi._
 @import views.html.helper._
 @implicitField = @{ FieldConstructor(fieldConstructor.f) }
 
@@ -19,12 +20,12 @@
     </tr>
   </thead>
   <tbody>
-  @geneSets.toSeq.sortBy(_._1).map{ tup =>
+  @geneSets.map{ case (geneset,enrichments) =>
 	
 	<tr>
-      <td><a href="@routes.Application.showGeneSet(java.net.URLEncoder.encode(tup._1,"utf-8"))">@tup._1</a></td>      
+      <td><a href="@routes.ClusterController.showGeneSet(java.net.URLEncoder.encode(geneset.name,"utf-8"))">@geneset.name</a></td>      
       <td>
-        <span class="badge @(if(tup._2._2.size > 0) "badge-important") ">@tup._2._2.size</span>
+        <span class="badge @(if(enrichments.size > 0) "badge-important") ">@enrichments.size</span>
       </td>
     </tr>
 

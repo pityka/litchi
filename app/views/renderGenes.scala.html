@@ -1,6 +1,6 @@
-@(genes: Traversable[hiv24.Gene], imageB64: String, geneInputForm:Form[Tuple2[String,Option[String]]])
+@(genes: Traversable[leachi.Gene], imageB64: String, geneInputForm:Form[Tuple2[String,Option[String]]],formTarget:play.api.mvc.Call)
 
-@import hiv24._
+@import leachi._
 
 @import views.html.helper._
 @implicitField = @{ FieldConstructor(fieldConstructor.f) }
@@ -10,10 +10,28 @@
 
 <img src="data:image/png;base64,@imageB64">
 
-<small style="color:#666;"><b>Figure:</b> Temporal expression patterns were grouped into clusters with differential expression profiles at
-three phases of the viral life cycle, namely reverse transcription, integration, and late phase.
-Boxplots on the left show the distribution of the normalized regression weights for each viral phase used in clustering.
-Expression change pattern of each gene over time is plotted for mock and HIV samples (dotted orange lines) along with the cluster median (bold red line).</small>
+
+<small style="color:#666;"><b>Figure:</b> : Temporal expression patterns are displayed according to the selected conditions and comparisons. The default view is Mock  (during latency) or DMSO (during reactivation). Expression levels can be shown in mock or infection conditions. For individual genes, select one from the table below.</small>
+</div>
+
+ @form(formTarget,'class -> "form-inline") {
+
+   <div >
+    
+    <div style="display:none;">
+@inputText(geneInputForm("idList"))
+@inputText(geneInputForm("clusterName"))
+
+</div>
+
+@select(geneInputForm("activator"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
+
+    
+    
+
+   }
+
+<small style="color:#666;"><b>Figure:</b> Legend.</small>
 
 </div>
 
@@ -21,37 +39,22 @@ Expression change pattern of each gene over time is plotted for mock and HIV sam
 
 
    <h6>List of genes</h1>
-   @form(routes.Application.listGenesFromForm) {
 
-   <div style="display:none;">
-    @inputText(geneInputForm("format"))
-    
-@inputText(geneInputForm("idList"))
-    
-    </div>
-    <div class="pull-right" style="margin-bottom:2px">
-    <i class="icon-download"></i>
-    <input type="submit" class="btn btn-primary" value="Get table as CSV">
-    </div>
-
-   }
 
  <table class="table table-striped table-bordered">
   <thead>
     <tr>
-      <th>Ensembl ID</th>
       <th>Name</th>      
-      <th>Cluster</th>      
+      <!-- <th>Cluster</th>       -->
     </tr>
   </thead>
   <tbody>
   	@genes.toSeq.sortBy(_.name).map { gene =>
     <tr>
-      <td><a href="@routes.Application.listGenes(gene.name)">@gene.ensembleId</a></td>
-      <td><a href="@routes.Application.listGenes(gene.name)">@gene.name</a></td>
-      <td>
-        <a href="@routes.Application.showCluster(gene.cluster.id)">@gene.cluster.name</a>
-      </td>      
+      <td><a href="@routes.GenesController.listGenes(gene.name,"DMSO")">@gene.name</a></td>
+      <!-- <td>
+        <a href="routes.ClusterController.showCluster(GeneData.clusterByGene(gene).head.name)">GeneData.clusterByGene(gene).head.name</a>
+      </td>       -->
     </tr>
 }
   </tbody>

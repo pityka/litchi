@@ -1,0 +1,49 @@
+@(name:String,data:  Vector[leachi.EnrichmentResult])
+
+<h6>Cluster @name is enriched in the following gene classes</h1>
+
+ <table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>GeneSet DB</th>
+      <th>Hit Count</th>
+    </tr>
+  </thead>
+  <tbody>
+  @data.groupBy(_.database).map { case (name,list) =>
+  <tr>
+    <td>@name</td>
+    <td>@list.size</td>
+  </tr>
+}
+</tbody>
+</table>
+
+ <table class="table table-striped table-bordered">
+  <thead>
+    <tr>
+      <th>Cluster Name</th>
+      <th>GeneSet Name</th>
+      <th>GeneSet DB</th>
+      <th>log(P)</th>
+      <th>Qvalue</th>
+      <th>Observed in Background</th>
+      <th>Observed in Cluster</th>
+      <th>Expected in Cluster</th>
+    </tr>
+  </thead>
+  <tbody>
+  	@data.sortBy(_.cluster.name).map { res =>
+    <tr>
+      <td><a href="@routes.ClusterController.showCluster(res.cluster.name)">@res.cluster.name.replace('_',' ')</a></td>
+      <td><a href="@routes.ClusterController.showGeneSet(res.predefinedSet.name)">@res.predefinedSet.name.replace('_',' ')</a></td>
+      <td>@res.database</td>
+      <td>@res.logP</td>
+      <td>@res.qVal</td>
+      <td>@res.countInBackground</td>
+      <td>@res.countInCluster</td>
+      <td>@res.expectedCount</td>
+    </tr>
+}
+  </tbody>
+</table>
