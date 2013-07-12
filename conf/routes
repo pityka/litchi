@@ -20,6 +20,8 @@ GET	/genes 						controllers.GenesController.listGenesFromForm
 GET 	/cluster/:id 			controllers.ClusterController.showCluster(id: String)
 GET 	/cluster 				controllers.ClusterController.showClusterFromForm
 
+GET /clustercsv/:id				controllers.ClusterController.csvCluster(id:String)
+
 GET /about							controllers.Application.about
 
 HEAD /ping						controllers.Application.ping

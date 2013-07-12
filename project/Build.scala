@@ -29,9 +29,7 @@ object ApplicationBuild extends Build {
         val username = System.getenv("CLOUDBEES_USER")
         val password = System.getenv("CLOUDBEES_PSW")
         val host = System.getenv("CLOUDBEES_HOST")
-        val realm = System.getenv("CLOUDBEES_REALM") 
-        import collection.JavaConversions._
-        println(System.getenv().toMap)
+        val realm = System.getenv("CLOUDBEES_REALM")        
         Credentials(realm,host,username,password)})
     }
           

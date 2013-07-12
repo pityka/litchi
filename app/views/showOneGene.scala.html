@@ -27,33 +27,28 @@ geneInputForm: Form[leachi.GeneFormObject])
 
 </div>
 
-
-@checkbox(geneInputForm("AZA"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-@checkbox(geneInputForm("DMSO"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-@checkbox(geneInputForm("SAHA"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-@checkbox(geneInputForm("DISU"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-@checkbox(geneInputForm("CD3"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-@checkbox(geneInputForm("IL7"),'onchange -> "this.form.submit()",'class->"checkbox inline")
-@checkbox(geneInputForm("HIV"),'onchange -> "this.form.submit()",'class->"checkbox inline")
-@checkbox(geneInputForm("Mock"),'onchange -> "this.form.submit()",'class->"checkbox inline") 
-
+<p>
+@checkbox(geneInputForm("AZA"),'onchange -> "this.form.submit()",'class->"checkbox inline" ,'_inline->"true") 
+@checkbox(geneInputForm("DMSO"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+@checkbox(geneInputForm("SAHA"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+@checkbox(geneInputForm("DISU"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+@checkbox(geneInputForm("CD3"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+@checkbox(geneInputForm("IL7"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true")
+@checkbox(geneInputForm("HIV"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true")
+@checkbox(geneInputForm("Mock"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+</p>
 
     
     
 
    }
 
-<small style="color:#666;"><b>Figure:</b>Temporal expression patterns of individual genes are displayed according to the selected conditions. Multiple conditions can be selected. The default view is Mock (during latency) or DMSO (during reactivation). Expression levels can be shown in mock or infection conditions (click the corresponding box).
+<p style="color:#666;clear:both;"><small ><b>Figure:</b>Temporal expression patterns of individual genes are displayed according to the selected conditions. Multiple conditions can be selected. The default view is Mock (during latency) or DMSO (during reactivation). Expression levels can be shown in mock or infection conditions (click the corresponding box).
+
 </small>
+</p>
 </div>
 
 
 
-
-   <h6>List of genes</h1>
-
-
-
-</table>
-    
 }

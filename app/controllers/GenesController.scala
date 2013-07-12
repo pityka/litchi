@@ -94,16 +94,6 @@ object GenesController extends Controller {
       })
   }
 
-  private def serveCSV(genes: Traversable[Gene])(implicit request: Request[_]): Result = {
-    if (genes.size == 0) NotFound else {
-      SimpleResult(
-        header = ResponseHeader(200, Map("Content-Disposition" -> "attachment; filename=table.txt")),
-        body = play.api.libs.iteratee.Enumerator(renderCSV(genes)))
-    }
-  }
-
-  private def renderCSV(genes: Traversable[Gene]) = genes.map(g => List(g.name).mkString(",")).mkString("\n")
-
   private def geneSetFromString(text: String): Set[Gene] = {
     val ids = mybiotools.fastSplitSetSeparator(text, SeparatorCharacters).distinct.map(_.toUpperCase)
     ids.map(x => GeneData.genes.find(y => y.name.toUpperCase == x)).filter(_.isDefined).map(_.get).toSet

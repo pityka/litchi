@@ -1,6 +1,6 @@
 @(elements: helper.FieldElements)
 
-<div class="control-group @if(elements.hasErrors) {"error"}">
+<div class="control-group @if(elements.hasErrors) {"error"}" @if(elements.args.get('_inline) == Some("true")) {style="float:left"}" >
     <label for="@elements.id" class="control-label">@elements.label</label>
     <div class="controls">
         @elements.input

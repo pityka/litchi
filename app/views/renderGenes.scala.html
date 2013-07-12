@@ -1,4 +1,6 @@
-@(genes: Traversable[leachi.Gene], imageB64: String, geneInputForm:Form[Tuple2[String,Option[String]]],formTarget:play.api.mvc.Call)
+@(genes: Traversable[leachi.Gene], imageB64: String, 
+geneInputForm: Form[(String,Option[String],Option[String])],
+formTarget:play.api.mvc.Call)
 
 @import leachi._
 
@@ -24,7 +26,8 @@
 
 </div>
 
-@select(geneInputForm("activator"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
+@select(geneInputForm("activator1"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
+@select(geneInputForm("activator2"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
 
     
     

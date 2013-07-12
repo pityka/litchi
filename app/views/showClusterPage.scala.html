@@ -2,12 +2,12 @@
  imageB64: Option[String],
  name:String,
   enrichments: Vector[leachi.EnrichmentResult],
-form: Form[Tuple2[String,Option[String]]],
+form: Form[(String,Option[String],Option[String])],
 formtarget:play.api.mvc.Call)
 
 @import leachi._
 
-@main("Show Genes") {
+@main("Show Cluster") {
 
 
           <ul class="nav nav-tabs">      
@@ -36,6 +36,7 @@ formtarget:play.api.mvc.Call)
 
 @imageB64.map{ image =>
 <div class="tab-pane @(if (imageB64.isDefined) "active" else "" )" id="expr">  
+	<a class="btn btn-primary pull-right" href="@routes.ClusterController.csvCluster(name)">Download list of genes</a>
 @views.html.renderGenes(genes,image,form,formtarget)
 </div>
 }
