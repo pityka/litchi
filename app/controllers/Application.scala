@@ -27,6 +27,10 @@ object Application extends Controller {
     Ok(views.html.about())
   }
 
+  def links = Action {
+    Ok(views.html.links())
+  }
+
   def index = Cached("index") {
     Action {
       // Ok("")

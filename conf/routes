@@ -23,6 +23,7 @@ GET 	/cluster 				controllers.ClusterController.showClusterFromForm
 GET /clustercsv/:id				controllers.ClusterController.csvCluster(id:String)
 
 GET /about							controllers.Application.about
+GET /links							controllers.Application.links
 
 HEAD /ping						controllers.Application.ping
 #GET /ping						controllers.Application.ping

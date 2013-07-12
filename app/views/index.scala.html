@@ -31,13 +31,14 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
     
 <section>
   <div class="row">
-    <div class="span4">
+    <div class="span5">
       @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
           <fieldset>
-          <legend>Compare conditions</legend>
-          @select(clusterForm("clusterName"),clusters.map(x => (x.name,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+          <legend>Compare Reactivating Agents</legend>
 
-          <span class="help-block">Paired gene expression tests generates sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
+          @select(clusterForm("clusterName"),clusters.filter(_.name.take(3) != "HIV").toSeq.sortBy(_.name).map(x => (x.name,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+
+          <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
           
           <div class="form-actions">
             <button type="submit" class="btn btn-primary">Submit</button>
@@ -47,7 +48,27 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
       }
     </div>
 
-    <div class="span4">
+    <div class="span5">
+      @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
+          <fieldset>
+          <legend>Compare Infection Conditions</legend>
+
+          @select(clusterForm("clusterName"),clusters.filter(_.name.take(3) == "HIV").toSeq.sortBy(_.name).map(x => (x.name,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+
+          <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+          </fieldset>
+          
+      }
+    </div>
+
+  </div>
+  <div class="row">
+
+    <div class="span5">
      @form(routes.GenesController.listGenesFromForm, 'class->"form-inline") {
       <fieldset>    
               <legend>Search a custom set of genes</legend>
@@ -63,7 +84,7 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
      }
     </div>
 
-    <div class="span4">
+    <div class="span5">
     <legend>Browse the predefined gene sets and pathways (Keggs, GO, Reactome, HIV collections)
 </legend>
 
