@@ -30,7 +30,7 @@ object ClusterController extends Controller {
   def showClusterFromForm = Cached(request => request.toString) {
     Action { implicit request =>
       clusterSelectForm.bindFromRequest.fold(
-        errors => { println(errors); BadRequest },
+        errors => { BadRequest },
         cluster => {
 
           val (ac1, ac2) = if (cluster._2.isEmpty && cluster._3.isEmpty) {

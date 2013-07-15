@@ -1,5 +1,5 @@
 @(clusters:Traversable[leachi.GeneSet], 
-clusterForm:Form[(String,Option[String],Option[String])],
+clusterForm:Form[(Boolean,String,String)],
 geneInputForm:Form[leachi.GeneFormObject],
 queryForm:Form[Option[String]])
 
@@ -32,11 +32,15 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
 <section>
   <div class="row">
     <div class="span5">
-      @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
+      @form(routes.Application.compareConditions, 'class->"form-inline") {
           <fieldset>
           <legend>Compare Reactivating Agents</legend>
 
-          @select(clusterForm("clusterName"),clusters.filter(_.name.take(3) != "HIV").toSeq.sortBy(_.name).map(x => (x.name,x.name.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+          @select(clusterForm("activator1"),GeneData.listOfActivatorNames.map(x => (x,x)), '_label -> "",'_showConstraints -> "false") 
+
+          @select(clusterForm("activator2"),GeneData.listOfActivatorNames.map(x => (x,x)), '_label -> "",'_showConstraints -> "false") 
+
+          @select(clusterForm("up"),List(("true","Upregulated (in first)"),("false","Downregulated (in first)")), '_label -> "",'_showConstraints -> "false") 
 
           <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
           

@@ -19,6 +19,12 @@ import GenesController.geneInputForm
 
 object Application extends Controller {
 
+  val compareForm = Form(
+    tuple(
+      "up" -> boolean,
+      "activator1" -> text,
+      "activator2" -> text))
+
   def ping = Action {
     Ok("ittvagyok")
   }
@@ -34,15 +40,36 @@ object Application extends Controller {
   def index = Cached("index") {
     Action {
       // Ok("")
-      Ok(views.html.index(GeneData.clusters, ClusterController.clusterSelectForm, GenesController.geneInputForm, GenesController.geneSetQueryForm))
+      Ok(views.html.index(GeneData.clusters, compareForm, GenesController.geneInputForm, GenesController.geneSetQueryForm))
     }
   }
 
-  //   // GET /listgenesets/:text
-  //   def listGeneSets( text: String ) = Action {
-  //     val gs = geneSetsFromText( text )
-  //     Ok( views.html.geneSetList( gs.mapValues(gs => gs -> whichClustersAreEnrichedInGeneSet(gs)), geneSetQueryForm ) )
-  //   }
+  def compareConditions = Cached(request => request.toString) {
+    Action { implicit request =>
+      compareForm.bindFromRequest.fold(
+        errors => BadRequest,
+        tuple => {
+
+          val ac1 = tuple._2
+          val ac2 = tuple._3
+          val upInFirst = if (!tuple._1) "Up_in" else "Dn_in"
+          val dnInFirst = if (!tuple._1) "Dn_in" else "Up_in"
+
+          val forgedNames = List(
+            s"${ac1}vs${ac2}-${dnInFirst}-${ac2}-activated",
+            s"${ac2}vs${ac1}-${upInFirst}-${ac1}-activated",
+            s"${ac1}vs${ac2}-${dnInFirst}-${ac1}-activated",
+            s"${ac2}vs${ac1}-${upInFirst}-${ac2}-activated")
+
+          GeneData.clusters.map(_.name).filter { clustername =>
+
+            forgedNames.contains(clustername)
+
+          }
+            .headOption.map(x => Redirect(routes.ClusterController.showCluster(x))).getOrElse(Ok(views.html.emptyPage()))
+        })
+    }
+  }
 
   def getImageFuture(genes: Traversable[GeneExpression], name: String): Future[String] = {
     Future {
@@ -55,13 +82,6 @@ object Application extends Controller {
       DatatypeConverter.printBase64Binary(bs.toByteArray)
     }
   }
-
-  //   private def geneSetsFromText( t: String ) = {
-  //     val ids = mybiotools.fastSplitSetSeparator( t, SeparatorCharacters ).distinct.map( _.toUpperCase )
-  //     GeneData.predefinedGeneSets.filter( x => ids.contains( x._1.toUpperCase ) )
-  //   }
-
-  // private val CacheExpiryTime = current.configuration.getInt( "hiv24.cacheExpiryInSec" ).getOrElse(60*60)
 
 }
 

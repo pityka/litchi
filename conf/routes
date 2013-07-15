@@ -5,6 +5,9 @@
 # Home page
 GET     /                           controllers.Application.index
 
+# 
+GET 	/compareconditions 			controllers.Application.compareConditions
+
 # Show a predefined geneset
 GET 	/geneset/:name			controllers.ClusterController.showGeneSet(name: String)
 GET 	/listgeneset			controllers.GenesController.showAllGeneSets
