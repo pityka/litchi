@@ -55,7 +55,8 @@ object ClusterController extends Controller {
   }
 
   def showGeneSet(name: String) = Action {
-    GeneData.geneSetsByName.get(name).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Ok(views.html.emptyPage()))
+    val decodedName = java.net.URLDecoder.decode(name, "utf-8")
+    GeneData.geneSetsByName.get(decodedName).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Ok(views.html.emptyPage()))
   }
 
   def csvCluster(name: String) = Action {

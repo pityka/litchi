@@ -21,6 +21,7 @@ package object plots {
   import de.erichseifert.gral.plots.axes._
   import de.erichseifert.gral.plots.XYPlot.XYPlotArea2D
   import de.erichseifert.gral.graphics.AbstractDrawable
+  import de.erichseifert.gral.util._;
   import java.awt._;
   import scala.runtime.RichInt
   import scala.runtime.RichDouble
@@ -39,17 +40,17 @@ package object plots {
 
   def createTimeLinePlot(geneexpressions: Traversable[GeneExpression], title: String = ""): AbstractDrawable = {
 
-    def createPlot(dat: Traversable[(Color, Map[Int, Double])], maxY: Double, minY: Double, title: String, timeUnit: String): XYPlot = {
+    def createPlot(dat: Traversable[(Color, Map[Int, Double], String)], maxY: Double, minY: Double, title: String, timeUnit: String): XYPlot = {
       if (!dat.isEmpty) {
 
         val series = dat.map {
-          case (color, gene) =>
+          case (color, gene, name) =>
             val ser = new DataTable(classOf[java.lang.Double], classOf[java.lang.Double])
             gene.toSeq.sortBy(_._1).filter(_._2 > 0.0).foreach { tuple =>
               ser.add(tuple._1.toDouble, math.log10(tuple._2 + 1.0))
             }
 
-            (color, ser)
+            (color, ser, name)
         }
 
         val maxX = dat.map(_._2).map(x => x.map(_._1).toList).flatten.max
@@ -58,7 +59,7 @@ package object plots {
         val plotHIV = new XYPlot()
         plotHIV.setSetting(Plot.AUTOSCALE_AFTER_ADD, false)
         series.foreach {
-          case (color, ser) =>
+          case (color, ser, name) =>
             plotHIV.add(ser)
             val lr = new DefaultLineRenderer2D();
             lr.setSetting(LineRenderer.COLOR, color)
@@ -110,6 +111,20 @@ package object plots {
         plotHIV.setSetting(Plot.TITLE, title.grouped(30).mkString("\n") + " : Gene expression pattern");
         plotHIV.setSetting(Plot.TITLE_FONT, titlefont)
 
+        val legend = plotHIV.getLegend()
+        legend.clear()
+        series.groupBy(_._1).mapValues(_.head).values.foreach {
+          case (color, s, name) =>
+            s.setName(name)
+            legend.add(s)
+        }
+        plotHIV.setSetting(Plot.LEGEND, true)
+        plotHIV.setSetting(Plot.LEGEND_DISTANCE, 3)
+        println(plotHIV.setSetting(Plot.LEGEND_LOCATION, Location.SOUTH))
+        // legend.setSetting(Legend.GAP, new Dimension2D.Double(1.0, 1.0))
+
+        // legend.setSetting(Legend.SYMBOL_SIZE, new Dimension2D.Double(0.0, 0.0))
+
         plotHIV
       } else {
         new XYPlot()
@@ -125,13 +140,13 @@ package object plots {
       val activatedPlot = createPlot(
         activatedData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          col -> ge.expression
+          (col, ge.expression, (ge.activation.toString + " " + ge.infection))
         }.take(2000), maxY, minY, "Activated", "hours")
 
       val restingPlot = createPlot(
         restingData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          col -> ge.expression
+          (col, ge.expression, (ge.activation.toString + " " + ge.infection))
         }.take(2000),
         maxY, minY, "Resting", "weeks")
 
@@ -146,7 +161,7 @@ package object plots {
 
       val insetsTop = 20.0
       val insetsLeft = 90.0
-      val insetsBottom = 60.0
+      val insetsBottom = 90.0
       val insetsRight = 20.0
       activatedPlot.setInsets(new Insets2D.Double(
         insetsTop, 5, insetsBottom, insetsRight));

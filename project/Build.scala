@@ -10,7 +10,7 @@ object ApplicationBuild extends Build {
     val appDependencies = Seq(
       // Add your project dependencies here,
       "pityu" %% "commons" % "2",
-      "de.erichseifert.gral" %% "gral" % "0.9-SNAPSHOT-pityu3b5",
+      "de.erichseifert.gral" %% "gral" % "0.9-SNAPSHOT-pityu3b8",
       "de.erichseifert.gral" %% "vectorgraphics2d" % "0.9.1-pityu1b3"
       
     )
