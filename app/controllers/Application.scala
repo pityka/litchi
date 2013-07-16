@@ -87,7 +87,9 @@ object Application extends Controller {
 
         DatatypeConverter.printBase64Binary(bs.toByteArray)
       })
-      f.onComplete(s => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime))
+      f.onSuccess {
+        case (s: String) => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime)
+      }
       f
     }
   }
