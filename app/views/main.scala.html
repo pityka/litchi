@@ -7,6 +7,7 @@
     <title>@title</title>
     <meta name="description" content="Power Exploratory Analysis Clustering HIV Host Interactions">
     <meta name="author" content="">
+    @Html(com.newrelic.api.agent.NewRelic.getBrowserTimingHeader())
 
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -76,6 +77,6 @@
       </footer>
 
     </div> <!-- /container -->
-
+    @Html(com.newrelic.api.agent.NewRelic.getBrowserTimingFooter())
   </body>
 </html>
