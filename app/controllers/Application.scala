@@ -65,7 +65,7 @@ object Application extends Controller {
             s"${ac1}vs${ac2}-${dnInFirst}-${ac1}-activated",
             s"${ac2}vs${ac1}-${upInFirst}-${ac2}-activated")
 
-          GeneData.clusters.map(_.name).filter { clustername =>
+          GeneData.clusters.map(_.name.value).filter { clustername =>
 
             forgedNames.contains(clustername)
 
@@ -75,17 +75,24 @@ object Application extends Controller {
     }
   }
 
-  def getImageFuture(genes: Traversable[GeneExpression], name: String): Future[String] = {
-    Future {
-      val factory = DrawableWriterFactory.getInstance();
-      val writer = factory.get("image/png");
-      val plot = plots.createTimeLinePlot(genes, name)
-      val bs = new ByteArrayOutputStream()
-      writer.write(plot, bs, 900, 300);
+  def getImageFuture(genes: Traversable[GeneExpression], name: String): Future[String] = play.api.cache.Cache.get("image-" + name) match {
+    case Some(x) => Promise.pure(x.asInstanceOf[String])
+    case None => {
+      val f = (Future {
+        val factory = DrawableWriterFactory.getInstance();
+        val writer = factory.get("image/png");
+        val plot = plots.createTimeLinePlot(genes, name)
+        val bs = new ByteArrayOutputStream()
+        writer.write(plot, bs, 900, 300);
 
-      DatatypeConverter.printBase64Binary(bs.toByteArray)
+        DatatypeConverter.printBase64Binary(bs.toByteArray)
+      })
+      f.onComplete(s => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime))
+      f
     }
   }
+
+  val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60)
 
 }
 

@@ -5,6 +5,7 @@ import scala.io.Source
 import leachi._
 import java.io.File
 import mybiotools._
+import stringstore._
 
 object GeneData {
 
@@ -35,17 +36,17 @@ object GeneData {
 
   val predefinedGeneSets: Vector[GeneSet] = geneSetFiles.flatMap { x =>
     val geneSetFile = x._2
-    val dbname = new File(x._1).getName
+    val dbname = StringStore(new File(x._1).getName)
     readGeneSets(geneSetFile, dbname)
   }.toVector
 
   val enrichmentTests: Vector[EnrichmentResult] = enrichmentTestsFiles.map(x => readEnrichmentFile(x._2, new File(x._1).getName, clusters, predefinedGeneSets)).reduce(_ ++ _)
 
-  val enrichmentTestsByClusterName: Map[String, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.cluster.name).toMap
+  val enrichmentTestsByClusterName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.cluster.name).toMap
 
-  val enrichmentTestsByGeneSetName: Map[String, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.predefinedSet.name).toMap
+  val enrichmentTestsByGeneSetName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.predefinedSet.name).toMap
 
-  val geneSetsByName: Map[String, GeneSet] = (clusters ++ predefinedGeneSets).map(x => x.name -> x).toMap
+  val geneSetsByName: Map[String8, GeneSet] = (clusters ++ predefinedGeneSets).map(x => x.name -> x).toMap
 
   val clusterByGene: Map[Gene, Set[GeneSet]] = clusters.map(cl => cl.set.map(g => g -> Set(cl)).toMap).reduce((x, y) => mybiotools.addMaps(x, y)(_ ++ _))
 

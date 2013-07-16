@@ -2,7 +2,12 @@ import scala.io.Source
 import mybiotools.readTableAsMap
 import mybiotools.readTable
 
+import mybiotools.stringstore._
+import language.implicitConversions
+
 package object leachi {
+
+  implicit def tup2spec2(x: Tuple2[Int, Float]): Spec2 = Spec2(x._1, x._2)
 
   case class GeneFormObject(
       idList: String,
@@ -46,14 +51,14 @@ package object leachi {
 
     it.toVector.flatMap { line =>
       val spl = mybiotools.fastSplitSeparator(line, ' ')
-      val geneName = Gene(spl(0).stripPrefix("\"").stripSuffix("\""))
+      val geneName = Gene.fromIntern(StringStore(spl(0).stripPrefix("\"").stripSuffix("\"")))
 
       val data: Map[String, Float] = (head zip (spl.drop(1).map(_.toFloat))).toMap
 
       Vector(
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW0"),
             2 -> data("mockW2"),
             4 -> data("mockW4"),
@@ -66,7 +71,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW0"),
             2 -> data("HIVW2"),
             4 -> data("HIVW4"),
@@ -79,7 +84,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("DMSO.8H"),
             24 -> data("DMSO.24H")
@@ -89,7 +94,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("SAHA.8H"),
             24 -> data("SAHA.24H")
@@ -99,7 +104,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("DISU.8H"),
             24 -> data("DISU.24H")
@@ -109,7 +114,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("AZA.8H"),
             24 -> data("AZA.24H")
@@ -119,7 +124,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("IL7.8H"),
             24 -> data("IL7.24H")
@@ -129,7 +134,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("HIVW10"),
             8 -> data("CD3.8H"),
             24 -> data("CD3.24H")
@@ -139,7 +144,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("DMSO.8Hmock"),
             24 -> data("DMSO.24Hmock")
@@ -149,7 +154,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("SAHA.8Hmock"),
             24 -> data("SAHA.24Hmock")
@@ -159,7 +164,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("DISU.8Hmock"),
             24 -> data("DISU.24Hmock")
@@ -169,7 +174,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("AZA.8Hmock"),
             24 -> data("AZA.24Hmock")
@@ -179,7 +184,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("IL7.8Hmock"),
             24 -> data("IL7.24Hmock")
@@ -189,7 +194,7 @@ package object leachi {
         ),
         GeneExpression(
           gene = geneName,
-          expression = Map(
+          expression = List(
             0 -> data("mockW10"),
             8 -> data("CD3.8Hmock"),
             24 -> data("CD3.24Hmock")
@@ -202,15 +207,18 @@ package object leachi {
     }
   }
 
-  def readGeneSets(geneSetFile: Source, dbName: String): Vector[GeneSet] = {
+  def readGeneSets(geneSetFile: Source, dbName: String8): Vector[GeneSet] = {
     geneSetFile.getLines.map { line =>
       val spl = mybiotools.fastSplitSeparator(line, '\t')
-      val name = new String(spl.head) //.replaceAll("\""," ").trim
-      val dbname = spl(1)
-      val set = spl.drop(2).map { gene =>
-        Gene(new String(gene))
+      val name: String8 = StringStore(new String(spl.head)) //.replaceAll("\""," ").trim
+      // val dbname: String8 = StringStore(new String(spl(1)))
+      val set: Set[Gene] = spl.drop(2).map { gene =>
+        Gene.fromIntern(StringStore(new String(gene)))
       }.toSet
-      GeneSet(name, dbName, set)
+
+      GeneSet(name,
+        dbName,
+        set)
     }.toVector
   }
 
@@ -221,21 +229,21 @@ package object leachi {
       val spl = mybiotools.fastSplitSeparator(line, '\t')
       // DataBase  ClusterName SetName Over/UnderRep.  log10(Pval) Qval  CountinBackground ExpectedCount CountinCluster  SourceUrl ClusterID theGenes
       val logp = spl(4) match {
-        case x if x == "-Inf" => Double.MinValue
-        case x if x == "Inf" => Double.MaxValue
-        case x => x.toDouble
+        case x if x == "-Inf" => Float.MinValue
+        case x if x == "Inf" => Float.MaxValue
+        case x => x.toFloat
       }
-      val qval = spl(5).toDouble
+      val qval = spl(5).toFloat
       val countInBackground = spl(6).toInt
-      val expectedcount = spl(7).toDouble
+      val expectedcount = spl(7).toFloat
       val countInCluster = spl(8).toInt
       val source = spl(9)
       val clustername = clusternameprefix + "-" + spl(1)
       val db = spl(0)
       val setname = spl(2)
       val direction = spl(3)
-      val predefinedSet = geneSets.filter(_.name == setname).headOption
-      val cluster = clusters.filter(_.name == clustername).headOption
+      val predefinedSet = geneSets.filter(_.name.value == setname).headOption
+      val cluster = clusters.filter(_.name.value == clustername).headOption
       if (predefinedSet.isDefined && cluster.isDefined)
         Some(EnrichmentResult(
           logP = logp,
@@ -243,11 +251,11 @@ package object leachi {
           countInBackground = countInBackground,
           expectedCount = expectedcount,
           countInCluster = countInCluster,
-          sourceURL = source,
+          sourceURL = new String(source),
           cluster = cluster.get,
           predefinedSet = predefinedSet.get,
-          direction = direction,
-          database = db))
+          direction = new String(direction),
+          database = new String(db)))
       else None
     }.filter(_.isDefined).map(_.get).toVector
 
@@ -256,7 +264,7 @@ package object leachi {
   def readClusterFiles(in: Map[String, io.Source]): Vector[GeneSet] = {
     in.map {
       case (name, source) =>
-        GeneSet(name = name.dropRight(4), dataBase = "diffexp", set = source.getLines.map(x => Gene(x.stripPrefix("\"").stripSuffix("\""))).toSet)
+        GeneSet(name = StringStore(new String(name.dropRight(4))), dataBase = StringStore("diffexp"), set = source.getLines.map(x => Gene.fromIntern(StringStore(x.stripPrefix("\"").stripSuffix("\"")))).toSet)
     }.toVector
   }
 

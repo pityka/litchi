@@ -40,7 +40,7 @@ package object plots {
 
   def createTimeLinePlot(geneexpressions: Traversable[GeneExpression], title: String = ""): AbstractDrawable = {
 
-    def createPlot(dat: Traversable[(Color, Map[Int, Double], String)], maxY: Double, minY: Double, title: String, timeUnit: String): XYPlot = {
+    def createPlot(dat: Traversable[(Color, scala.collection.immutable.List[Spec2], String)], maxY: Double, minY: Double, title: String, timeUnit: String): XYPlot = {
       if (!dat.isEmpty) {
 
         val series = dat.map {
@@ -95,7 +95,7 @@ package object plots {
         yAxis.setRange(math.log10(minY + 1.0) - 0.5, math.log10(maxY + 1.0) + 0.5)
 
         rendererX.setSetting(AxisRenderer.LABEL, s"Time ($timeUnit)")
-        rendererY.setSetting(AxisRenderer.LABEL, "UNIT??")
+        rendererY.setSetting(AxisRenderer.LABEL, "log2(normalized counts)")
 
         rendererX.setSetting(AxisRenderer.TICKS_MINOR, false)
 
@@ -132,8 +132,8 @@ package object plots {
     }
 
     if (!geneexpressions.isEmpty) {
-      val maxY = geneexpressions.flatMap(_.expression.values).max
-      val minY = geneexpressions.flatMap(_.expression.values).min
+      val maxY = geneexpressions.flatMap(_.expression.map(_._2)).max
+      val minY = geneexpressions.flatMap(_.expression.map(_._2)).min
 
       val (restingData, activatedData) = geneexpressions.partition(_.activation == Resting)
 

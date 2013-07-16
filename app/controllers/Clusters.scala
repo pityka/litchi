@@ -18,6 +18,8 @@ import ExecutionContext.Implicits.global
 
 import GenesController.geneInputForm
 
+import mybiotools.stringstore.String8
+
 object ClusterController extends Controller {
 
   val clusterSelectForm = Form(
@@ -38,7 +40,7 @@ object ClusterController extends Controller {
             (activators.head, activators.drop(1).headOption.getOrElse(activators.head))
           } else (GenesController.activatorFromString(cluster._2), GenesController.activatorFromString(cluster._3))
 
-          val cl = GeneData.geneSetsByName.get(cluster._1)
+          val cl = GeneData.geneSetsByName.get(new String8(cluster._1))
           cl.map(showClusterHelper(_, true,
             ac1,
             ac2
@@ -50,17 +52,17 @@ object ClusterController extends Controller {
   // GET /cluster/:ID
   def showCluster(name: String) = Action {
     val activators = getActivatorsFromClusterName(name)
-    GeneData.geneSetsByName.get(name).map(showClusterHelper(_, true, activators.head, activators.drop(1).head)).getOrElse(BadRequest)
+    GeneData.geneSetsByName.get(new String8(name)).map(showClusterHelper(_, true, activators.head, activators.drop(1).head)).getOrElse(BadRequest)
 
   }
 
   def showGeneSet(name: String) = Action {
     val decodedName = java.net.URLDecoder.decode(name, "utf-8")
-    GeneData.geneSetsByName.get(decodedName).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Ok(views.html.emptyPage()))
+    GeneData.geneSetsByName.get(new String8(decodedName)).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Ok(views.html.emptyPage()))
   }
 
   def csvCluster(name: String) = Action {
-    GeneData.geneSetsByName.get(name).map(serveCSV).getOrElse(BadRequest)
+    GeneData.geneSetsByName.get(new String8(name)).map(serveCSV).getOrElse(BadRequest)
   }
 
   private def serveCSV(cluster: GeneSet): Result = {
@@ -79,10 +81,8 @@ object ClusterController extends Controller {
     val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => List(Resting, activator1, activator2).contains(x.activation) && (x.infection == HIV))
 
     val promiseOfImage: Future[Option[String]] = if (genes.size > 0) {
-      play.api.cache.Cache.get(cluster.name + activator1.toString + activator2.toString) match {
-        case Some(x) => Promise.pure(Some(x.asInstanceOf[String]))
-        case None => Application.getImageFuture(geneExpressionData, cluster.name.toString).map(x => Some(x))
-      }
+      Application.getImageFuture(geneExpressionData, cluster.name + "-" + activator1.toString + "-" + activator2.toString).map(x => Some(x))
+
     } else {
       Promise.pure(None)
     }
@@ -92,7 +92,6 @@ object ClusterController extends Controller {
 
     Async {
       promiseOfImage.map { (image: Option[String]) =>
-        image.foreach(x => play.api.cache.Cache.set(cluster.name + activator1.toString + activator2.toString, x))
         Ok(views.html.showClusterPage(genes, image, cluster.name, enrichmentResults, bindGenesToClusterForm(cluster, activator1, activator2), routes.ClusterController.showClusterFromForm))
       }
 
@@ -106,7 +105,7 @@ object ClusterController extends Controller {
   }
 
   def bindGenesToClusterForm(cluster: GeneSet, activator1: Activation, activator2: Activation) = clusterSelectForm.bind(Map(
-    "clusterName" -> cluster.name,
+    "clusterName" -> cluster.name.value,
     ("activator1" -> (activator1 match {
       case AZA => "AZA"
       case CD3 => "CD3"

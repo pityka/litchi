@@ -58,7 +58,7 @@ object GenesController extends Controller {
 
       val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => (Resting :: activators).contains(x.activation) && infection.contains(x.infection))
 
-      val promiseOfImage = Application.getImageFuture(geneExpressionData, "Custom geneset")
+      val promiseOfImage = Application.getImageFuture(geneExpressionData, "")
       Async {
         promiseOfImage.map { (image: String) =>
           Ok(views.html.showOneGene(genes, Some(image), genes.map(_.name).mkString(" "), bindGenesToForm(genes, activators, infection)))
