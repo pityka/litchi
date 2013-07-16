@@ -56,8 +56,8 @@ object Application extends Controller {
           val dnInFirst = if (!tuple._1) "Dn_in" else "Up_in"
 
           val forgedNames = List(
-            s"${ac1}vs${ac2}-${dnInFirst}-${ac2}-activated",
-            s"${ac2}vs${ac1}-${upInFirst}-${ac1}-activated",
+            s"${ac1}vs${ac2}-${upInFirst}-${ac2}-activated",
+            s"${ac2}vs${ac1}-${dnInFirst}-${ac1}-activated",
             s"${ac1}vs${ac2}-${dnInFirst}-${ac1}-activated",
             s"${ac2}vs${ac1}-${upInFirst}-${ac2}-activated")
 
