@@ -120,6 +120,7 @@ package object plots {
         }
         plotHIV.setSetting(Plot.LEGEND, true)
         plotHIV.setSetting(Plot.LEGEND_DISTANCE, 3)
+        plotHIV.setSetting(Plot.LEGEND_LOCATION, Location.SOUTH)
         // legend.setSetting(Legend.GAP, new Dimension2D.Double(1.0, 1.0))
 
         // legend.setSetting(Legend.SYMBOL_SIZE, new Dimension2D.Double(0.0, 0.0))
