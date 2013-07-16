@@ -37,7 +37,7 @@ formtarget:play.api.mvc.Call)
 @imageB64.map{ image =>
 <div class="tab-pane @(if (imageB64.isDefined) "active" else "" )" id="expr">  
 	<a class="btn btn-primary pull-right" href="@routes.ClusterController.csvCluster(name)">Download list of genes</a>
-@views.html.renderGenes(genes,image,form,formtarget)
+@views.html.renderGenes(genes,image,form,formtarget,name)
 </div>
 }
 

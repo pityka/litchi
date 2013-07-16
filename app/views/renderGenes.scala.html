@@ -1,6 +1,7 @@
 @(genes: Traversable[leachi.Gene], imageB64: String, 
 geneInputForm: Form[(String,Option[String],Option[String])],
-formTarget:play.api.mvc.Call)
+formTarget:play.api.mvc.Call,
+name:String)
 
 @import leachi._
 
@@ -8,7 +9,7 @@ formTarget:play.api.mvc.Call)
 @implicitField = @{ FieldConstructor(fieldConstructor.f) }
 
 <div style="margin-bottom:20px">
-<h6>Gene expression pattern</h1>
+<h6>Gene expression pattern of @name</h1>
 
 <img src="data:image/png;base64,@imageB64">
 
