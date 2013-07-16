@@ -29,6 +29,10 @@ object Application extends Controller {
     Ok("ittvagyok")
   }
 
+  def pinghead = Action {
+    Ok("ittvagyok")
+  }
+
   def about = Action {
     Ok(views.html.about())
   }

@@ -47,7 +47,7 @@ package object plots {
           case (color, gene, name) =>
             val ser = new DataTable(classOf[java.lang.Double], classOf[java.lang.Double])
             gene.toSeq.sortBy(_._1).filter(_._2 > 0.0).foreach { tuple =>
-              ser.add(tuple._1.toDouble, math.log10(tuple._2 + 1.0))
+              ser.add(tuple._1.toDouble, math.log10(tuple._2 + 1.0)) / math.log10(2.0)
             }
 
             (color, ser, name)
