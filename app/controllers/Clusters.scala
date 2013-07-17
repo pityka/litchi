@@ -73,12 +73,12 @@ object ClusterController extends Controller {
       body = play.api.libs.iteratee.Enumerator(renderCSV(genes)))
   }
 
-  private def renderCSV(genes: Traversable[Gene]) = genes.map(g => List(g.name).mkString(",")).mkString("\n")
+  private def renderCSV(genes: Traversable[GeneWithDEG]) = genes.map(g => (List(g.gene.name) ++ g.deg.map(d => List(d.foldChange, d.p, d.pAdj)).getOrElse(Nil)).mkString(",")).mkString("\n")
 
   private def showClusterHelper(cluster: GeneSet, searchInClusters: Boolean, activator1: Activation, activator2: Activation): Result = {
     val genes = GeneData.genesByCluster(cluster)
 
-    val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => List(Resting, activator1, activator2).contains(x.activation) && (x.infection == HIV))
+    val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x.gene)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => List(Resting, activator1, activator2).contains(x.activation) && (x.infection == HIV))
 
     val promiseOfImage: Future[Option[String]] = if (genes.size > 0) {
       Application.getImageFuture(geneExpressionData, cluster.name + "-" + activator1.toString + "-" + activator2.toString).map(x => Some(x))

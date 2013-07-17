@@ -23,13 +23,17 @@ object Gene {
 
 case class Spec2(_1: Int, _2: Float)
 
+case class DEG(foldChange: Float, p: Float, pAdj: Float)
+
+case class GeneWithDEG(gene: Gene, deg: Option[DEG])
+
 case class GeneExpression(
   gene: Gene,
   expression: List[Spec2],
   infection: Infection,
   activation: Activation)
 
-case class GeneSet(name: String8, dataBase: String8, set: Set[Gene])
+case class GeneSet(name: String8, dataBase: String8, set: Set[GeneWithDEG])
 
 case class EnrichmentResult(logP: Float,
   qVal: Float,

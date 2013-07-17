@@ -1,4 +1,4 @@
-@(genes: Traversable[leachi.Gene], imageB64: String, 
+@(genes: Traversable[leachi.GeneWithDEG], imageB64: String, 
 geneInputForm: Form[(String,Option[String],Option[String])],
 formTarget:play.api.mvc.Call,
 name:String)
@@ -47,14 +47,24 @@ name:String)
  <table class="table table-striped table-bordered">
   <thead>
     <tr>
-      <th>Name</th>      
+      <th>Name</th>  
+      @if(genes.head.deg.isDefined){
+      <th>Fold</th>
+      <th>p</th>
+      <th>p-Adj</th>
+    }    
       <!-- <th>Cluster</th>       -->
     </tr>
   </thead>
   <tbody>
-  	@genes.toSeq.sortBy(_.name).map { gene =>
+  	@genes.toSeq.sortBy(_.gene.name).map { gene =>
     <tr>
-      <td><a href="@routes.GenesController.listGenes(gene.name,"DMSO")">@gene.name</a></td>
+      <td><a href="@routes.GenesController.listGenes(gene.gene.name,"DMSO")">@gene.gene.name</a></td>
+      @if(gene.deg.isDefined){
+      <th>@gene.deg.get.foldChange</th>
+      <th>@gene.deg.get.p</th>
+      <th>@gene.deg.get.pAdj</th>
+    }    
       <!-- <td>
         <a href="routes.ClusterController.showCluster(GeneData.clusterByGene(gene).head.name)">GeneData.clusterByGene(gene).head.name</a>
       </td>       -->

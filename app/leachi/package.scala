@@ -212,8 +212,8 @@ package object leachi {
       val spl = mybiotools.fastSplitSeparator(line, '\t')
       val name: String8 = StringStore(new String(spl.head)) //.replaceAll("\""," ").trim
       // val dbname: String8 = StringStore(new String(spl(1)))
-      val set: Set[Gene] = spl.drop(2).map { gene =>
-        Gene.fromIntern(StringStore(new String(gene)))
+      val set: Set[GeneWithDEG] = spl.drop(2).map { gene =>
+        GeneWithDEG(Gene.fromIntern(StringStore(new String(gene))), None)
       }.toSet
 
       GeneSet(name,
@@ -264,7 +264,14 @@ package object leachi {
   def readClusterFiles(in: Map[String, io.Source]): Vector[GeneSet] = {
     in.map {
       case (name, source) =>
-        GeneSet(name = StringStore(new String(name.dropRight(4))), dataBase = StringStore("diffexp"), set = source.getLines.map(x => Gene.fromIntern(StringStore(x.stripPrefix("\"").stripSuffix("\"")))).toSet)
+        GeneSet(name = StringStore(new String(name.dropRight(4))), dataBase = StringStore("diffexp"), set = source.getLines.map { x =>
+          val spl = x.split(",")
+          val name = spl(0).stripPrefix("\"").stripSuffix("\"")
+          val fold = spl(1).stripPrefix("\"").stripSuffix("\"").toFloat
+          val p = spl(2).stripPrefix("\"").stripSuffix("\"").toFloat
+          val padj = spl(3).stripPrefix("\"").stripSuffix("\"").toFloat
+          GeneWithDEG(Gene.fromIntern(StringStore(name)), Some(DEG(fold, p, padj)))
+        }.toSet)
     }.toVector
   }
 
