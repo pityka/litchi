@@ -21,34 +21,33 @@ object GeneData {
     x -> Source.fromURL(getClass.getResource(x))
   }
 
-  val clusters: Vector[GeneSet] = readClusterFiles(clustersFile.getLines.map { file =>
+  lazy val clusters: Vector[GeneSet] = readClusterFiles(clustersFile.getLines.map { file =>
 
     file -> Source.fromURL(getClass.getResource("/inputfiles/Clusters/" + file))
   }.toMap)
 
-  val expressions: Vector[GeneExpression] = readExpressionFile(expressionsFile)
-
-  val expressionsByGene: Map[Gene, Vector[GeneExpression]] = expressions.groupBy(_.gene).toMap
-
-  val genes = expressions.map(_.gene).distinct
+  lazy val (expressionsByGene: Map[Gene, Vector[GeneExpression]], genes) = {
+    val expressions: Vector[GeneExpression] = readExpressionFile(expressionsFile)
+    (expressions.groupBy(_.gene).toMap, expressions.map(_.gene).distinct)
+  }
 
   def genesByCluster(cl: GeneSet) = cl.set
 
-  val predefinedGeneSets: Vector[GeneSet] = geneSetFiles.flatMap { x =>
+  lazy val predefinedGeneSets: Vector[GeneSet] = geneSetFiles.flatMap { x =>
     val geneSetFile = x._2
     val dbname = StringStore(new File(x._1).getName)
     readGeneSets(geneSetFile, dbname)
   }.toVector
 
-  val enrichmentTests: Vector[EnrichmentResult] = enrichmentTestsFiles.map(x => readEnrichmentFile(x._2, new File(x._1).getName, clusters, predefinedGeneSets)).reduce(_ ++ _)
+  lazy val enrichmentTests: Vector[EnrichmentResult] = enrichmentTestsFiles.map(x => readEnrichmentFile(x._2, new File(x._1).getName, clusters, predefinedGeneSets)).reduce(_ ++ _)
 
-  val enrichmentTestsByClusterName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.cluster.name).toMap
+  lazy val enrichmentTestsByClusterName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.cluster.name).toMap
 
-  val enrichmentTestsByGeneSetName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.predefinedSet.name).toMap
+  lazy val enrichmentTestsByGeneSetName: Map[String8, Vector[EnrichmentResult]] = enrichmentTests.groupBy(_.predefinedSet.name).toMap
 
-  val geneSetsByName: Map[String8, GeneSet] = (clusters ++ predefinedGeneSets).map(x => x.name -> x).toMap
+  lazy val geneSetsByName: Map[String8, GeneSet] = (clusters ++ predefinedGeneSets).map(x => x.name -> x).toMap
 
-  val clusterByGene: Map[Gene, Set[GeneSet]] = clusters.map(cl => cl.set.map(g => g.gene -> Set(cl)).toMap).reduce((x, y) => mybiotools.addMaps(x, y)(_ ++ _))
+  lazy val clusterByGene: Map[Gene, Set[GeneSet]] = clusters.map(cl => cl.set.map(g => g.gene -> Set(cl)).toMap).reduce((x, y) => mybiotools.addMaps(x, y)(_ ++ _))
 
   val listOfActivatorNames = List("CD3", "IL7", "AZA", "DISU", "SAHA", "DMSO")
 

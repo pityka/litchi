@@ -9,8 +9,8 @@ trait GlobalCommon extends GlobalSettings {
 
   override def onStart(app: Application) {
     Logger.info("Application has started")
-    Logger.info("Genes loaded: " + models.GeneData.genes.size)
-    Logger.info("Predefined genesets loaded: " + models.GeneData.predefinedGeneSets.size)
+    // Logger.info("Genes loaded: " + models.GeneData.genes.size)
+    // Logger.info("Predefined genesets loaded: " + models.GeneData.predefinedGeneSets.size)
   }
 
   override def onStop(app: Application) {
