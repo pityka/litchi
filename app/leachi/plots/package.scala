@@ -40,7 +40,7 @@ package object plots {
 
   def createTimeLinePlot(geneexpressions: Traversable[GeneExpression], title: String = ""): AbstractDrawable = {
 
-    def createPlot(dat: Traversable[(Color, scala.collection.immutable.List[Spec2], String)], maxY: Double, minY: Double, title: String, timeUnit: String): XYPlot = {
+    def createPlot(dat: Traversable[(Color, scala.collection.immutable.List[Spec2], String)], maxY: Double, minY: Double, title: String, timeUnit: String, legendLocation: Location, legendDistance: Double): XYPlot = {
       if (!dat.isEmpty) {
 
         val series = dat.map {
@@ -63,7 +63,7 @@ package object plots {
             plotHIV.add(ser)
             val lr = new DefaultLineRenderer2D();
             lr.setSetting(LineRenderer.COLOR, color)
-            lr.setSetting(LineRenderer.STROKE, new BasicStroke(3.0f))
+            lr.setSetting(LineRenderer.STROKE, new BasicStroke(1.5f))
             plotHIV.setLineRenderer(ser, lr)
             plotHIV.setPointRenderer(ser, null);
 
@@ -119,8 +119,8 @@ package object plots {
             legend.add(s)
         }
         plotHIV.setSetting(Plot.LEGEND, true)
-        plotHIV.setSetting(Plot.LEGEND_DISTANCE, 3)
-        plotHIV.setSetting(Plot.LEGEND_LOCATION, Location.SOUTH)
+        plotHIV.setSetting(Plot.LEGEND_DISTANCE, legendDistance)
+        plotHIV.setSetting(Plot.LEGEND_LOCATION, legendLocation)
         // legend.setSetting(Legend.GAP, new Dimension2D.Double(1.0, 1.0))
 
         // legend.setSetting(Legend.SYMBOL_SIZE, new Dimension2D.Double(0.0, 0.0))
@@ -141,14 +141,14 @@ package object plots {
         activatedData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
           (col, ge.expression, (ge.activation.toString + " " + ge.infection))
-        }.take(2000), maxY, minY, "Activated", "hours")
+        }.take(2000), maxY, minY, "Activated", "hours", Location.EAST, 0)
 
       val restingPlot = createPlot(
         restingData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
           (col, ge.expression, (ge.activation.toString + " " + ge.infection))
         }.take(2000),
-        maxY, minY, "Resting", "weeks")
+        maxY, minY, "Resting", "weeks", Location.SOUTH, 3)
 
       restingPlot.setAxis(XYPlot.AXIS_Y, activatedPlot.getAxis(XYPlot.AXIS_Y))
 
@@ -161,12 +161,12 @@ package object plots {
 
       val insetsTop = 20.0
       val insetsLeft = 90.0
-      val insetsBottom = 90.0
-      val insetsRight = 20.0
+      val insetsBottom = 95.0
+      val insetsRight = 80.0
       activatedPlot.setInsets(new Insets2D.Double(
-        insetsTop, 5, insetsBottom, insetsRight));
+        insetsTop, 5, insetsBottom, 110));
       restingPlot.setInsets(new Insets2D.Double(
-        insetsTop, insetsLeft, insetsBottom, 0));
+        insetsTop, insetsLeft, insetsBottom, 20));
 
       val container = new DrawableContainer(new TableLayout(2));
       container.add(restingPlot);

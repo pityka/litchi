@@ -38,7 +38,7 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
 
           @select(clusterForm("activator1"),GeneData.listOfActivatorNames.map(x => (x,x)), '_label -> "",'_showConstraints -> "false") 
 
-          @select(clusterForm("activator2"),GeneData.listOfActivatorNames.map(x => (x,x)), '_label -> "",'_showConstraints -> "false") 
+          @select(clusterForm("activator2"),GeneData.listOfActivatorNames.map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'_default->"IL7") 
 
           @select(clusterForm("up"),List(("true","Upregulated (in first)"),("false","Downregulated (in first)")), '_label -> "",'_showConstraints -> "false") 
 

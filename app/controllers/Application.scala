@@ -75,23 +75,30 @@ object Application extends Controller {
     }
   }
 
-  def getImageFuture(genes: Traversable[GeneExpression], name: String): Future[String] = play.api.cache.Cache.get("image-" + name) match {
-    case Some(x) => Promise.pure(x.asInstanceOf[String])
-    case None => {
-      val f = (Future {
-        val factory = DrawableWriterFactory.getInstance();
-        val writer = factory.get("image/png");
-        val plot = plots.createTimeLinePlot(genes, name)
-        val bs = new ByteArrayOutputStream()
-        writer.write(plot, bs, 900, 300);
+  def getImageFuture(genes: Traversable[GeneExpression], name: String, cacheResult: Boolean = true): Future[String] = {
+    def fun = {
+      val factory = DrawableWriterFactory.getInstance();
+      val writer = factory.get("image/png");
+      val plot = plots.createTimeLinePlot(genes, name)
+      val bs = new ByteArrayOutputStream()
+      writer.write(plot, bs, 900, 300);
 
-        DatatypeConverter.printBase64Binary(bs.toByteArray)
-      })
-      f.onSuccess {
-        case (s: String) => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime)
-      }
-      f
+      DatatypeConverter.printBase64Binary(bs.toByteArray)
     }
+
+    if (cacheResult)
+      play.api.cache.Cache.get("image-" + name) match {
+        case Some(x) => Promise.pure(x.asInstanceOf[String])
+        case None => {
+          val f = (Future(fun))
+          f.onSuccess {
+            case (s: String) => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime)
+          }
+          f
+        }
+      }
+    else Future(fun)
+
   }
 
   val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60)
