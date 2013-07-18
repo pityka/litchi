@@ -26,7 +26,7 @@ object GenesController extends Controller {
       "AZA" -> boolean,
       "SAHA" -> boolean,
       "DISU" -> boolean,
-      "CD3" -> boolean,
+      "TCR" -> boolean,
       "DMSO" -> boolean,
       "IL7" -> boolean,
       "HIV" -> boolean,

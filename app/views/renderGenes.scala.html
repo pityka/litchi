@@ -27,8 +27,8 @@ name:String)
 
 </div>
 
-@select(geneInputForm("activator1"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
-@select(geneInputForm("activator2"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
+@select(geneInputForm("activator1"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,if (x == "CD3") "TCR" else x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
+@select(geneInputForm("activator2"),List("AZA","DMSO","DISU","SAHA","CD3","IL7").map(x => (x,if (x == "CD3") "TCR" else x)), '_label -> "",'_showConstraints -> "false",'onchange -> "this.form.submit()") 
 
     
     

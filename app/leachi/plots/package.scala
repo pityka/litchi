@@ -140,13 +140,19 @@ package object plots {
       val activatedPlot = createPlot(
         activatedData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          (col, ge.expression, (ge.activation.toString + " " + ge.infection))
+          (col, ge.expression, (Some(ge.activation.toString).map {
+            case "CD3" => "TCR"
+            case x => x
+          }.get + " " + ge.infection))
         }.take(1500), maxY, minY, "Activated", "hours", Location.EAST, 0)
 
       val restingPlot = createPlot(
         restingData.map { ge =>
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          (col, ge.expression, (ge.activation.toString + " " + ge.infection))
+          (col, ge.expression, (Some(ge.activation.toString).map {
+            case "CD3" => "TCR"
+            case x => x
+          }.get + " " + ge.infection))
         }.take(1500),
         maxY, minY, "Resting", "weeks", Location.SOUTH, 3)
 

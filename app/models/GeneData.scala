@@ -49,6 +49,6 @@ object GeneData {
 
   lazy val clusterByGene: Map[Gene, Set[GeneSet]] = clusters.map(cl => cl.set.map(g => g.gene -> Set(cl)).toMap).reduce((x, y) => mybiotools.addMaps(x, y)(_ ++ _))
 
-  val listOfActivatorNames = List("CD3", "IL7", "AZA", "DISU", "SAHA", "DMSO")
+  val listOfActivatorNames = List("TCR", "IL7", "AZA", "DISU", "SAHA", "DMSO")
 
 }
