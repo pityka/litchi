@@ -8,6 +8,8 @@
  @form(routes.GenesController.queryGeneSets, 'class -> "form-inline") {
 
         <fieldset>
+        	<legend>Browse the predefined pathways
+</legend>
         @inputText(queryForm("keywords"), '_label -> "To see the whole list, just click the browse button", 'placeholder ->"type a keyword to filter") 
         <div class="form-actions">
         <input type="submit" value="Browse" class="btn btn-primary form-inline" href="@routes.GenesController.showAllGeneSets"> 

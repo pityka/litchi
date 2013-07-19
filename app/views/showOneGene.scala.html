@@ -32,7 +32,7 @@ geneInputForm: Form[leachi.GeneFormObject])
 @checkbox(geneInputForm("DMSO"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
 @checkbox(geneInputForm("SAHA"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
 @checkbox(geneInputForm("DISU"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
-@checkbox(geneInputForm("CD3"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
+@checkbox(geneInputForm("TCR"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
 @checkbox(geneInputForm("IL7"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true")
 @checkbox(geneInputForm("HIV"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true")
 @checkbox(geneInputForm("Mock"),'onchange -> "this.form.submit()",'class->"checkbox inline",'_inline->"true") 
@@ -43,7 +43,7 @@ geneInputForm: Form[leachi.GeneFormObject])
 
    }
 
-<p style="color:#666;clear:both;"><small ><b>Figure:</b>Temporal expression patterns of individual genes are displayed according to the selected conditions. Multiple conditions can be selected. The default view is Mock (during latency) or DMSO (during reactivation). Expression levels can be shown in mock or infection conditions (click the corresponding box).
+<p style="color:#666;clear:both;"><small ><b>Figure:</b>Temporal expression patterns of individual genes are displayed according to the selected conditions. Multiple conditions can be selected. The default view is HIV. Expression levels can be shown in mock or infection conditions (click the corresponding box).
 
 </small>
 </p>

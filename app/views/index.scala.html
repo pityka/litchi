@@ -12,13 +12,20 @@ queryForm:Form[Option[String]])
 
 <header class="subhead">
 <div class="row"> 
-<div class="span8">
+  <div class="span8">
 
-<h1>Latent Infection of T Cells by HIV
-</h1>
+   <h1>Latent Infection of T Cells by HIV
+    </h1>
+  </div>
 </div>
-<div class="span4">
-<img src="@routes.Assets.at("images/litchi.jpg")" >
+<div class="row">
+  <div class="span4" style="margin-top:20px;font-size:36px;">
+    <h1>LITCHi
+    </h1>
+  </div>
+  <div class="span4">
+    <img src="@routes.Assets.at("images/litchi.jpg")" >
+  </div>
 </div>
 <p class="lead">This resource allows the querying of cellular responses during HIV latency and reactivation.
 </p>
@@ -31,7 +38,7 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
     
 <section>
   <div class="row">
-    <div class="span4">
+    <div class="span5">
       @form(routes.Application.compareConditions, 'class->"form-inline") {
           <fieldset>
           <legend>Compare Reactivating Agents</legend>
@@ -52,12 +59,12 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
       }
     </div>
 
-       <div class="span4">
+       <div class="span5">
       @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
           <fieldset>
           <legend>Compare Infection Conditions</legend>
 
-          @select(clusterForm("clusterName"),clusters.filter(_.name.value.startsWith( "HIVvsMockinActivation")).toSeq.sortBy(_.name).map(x => (x.name.value,x.name.value.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+          @select(clusterForm("clusterName"),clusters.filter(_.name.value.startsWith( "HIVvsMockinLatency")).toSeq.sortBy(_.name).map(x => (x.name.value,x.name.value.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
 
           <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
           
@@ -89,8 +96,7 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
     </div>
 
     <div class="span5">
-    <legend>Browse the predefined gene sets and pathways (Keggs, GO, Reactome, HIV collections)
-</legend>
+    
 
      @views.html.filterForm(queryForm)
 
