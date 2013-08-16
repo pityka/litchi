@@ -101,7 +101,7 @@ object Application extends Controller {
 
   }
 
-  val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60)
+  val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60*168*52)
 
 }
 
