@@ -1,5 +1,13 @@
 @(name:String,data:  Vector[leachi.EnrichmentResult])
 
+<script>
+$(document).ready(function() 
+    { 
+        $("#enrichmenttable").tablesorter(); 
+    } 
+); 
+</script>
+
 <h6>Cluster @name is enriched in the following gene classes</h1>
 
  <table class="table table-striped table-bordered">
@@ -19,7 +27,7 @@
 </tbody>
 </table>
 
- <table class="table table-striped table-bordered">
+ <table id="enrichmenttable" class="table table-striped table-bordered">
   <thead>
     <tr>
       <th>Cluster Name</th>
