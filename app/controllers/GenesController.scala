@@ -81,7 +81,7 @@ object GenesController extends Controller {
 
       val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => (Resting :: activators).contains(x.activation) && infection.contains(x.infection))
 
-      val promiseOfImage = Application.getImageFutureBinary(geneExpressionData, "", cacheResult = false)
+      val promiseOfImage = Application.getImageFutureBinary(geneExpressionData, genes.head.name.value, cacheResult = false)
 
       model.TimeoutFuture(25 seconds)(promiseOfImage.map {
         image => Ok(image).as("image/png")
