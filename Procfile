@@ -1,1 +1,1 @@
-web: target/start -Dhttp.port=${PORT} ${JAVA_OPTS}
+web: target/universal/stage/bin/hiv24-web -Dhttp.port=$PORT $CONF_OVERRIDE

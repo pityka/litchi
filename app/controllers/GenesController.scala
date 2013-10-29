@@ -12,6 +12,7 @@ import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
 import play.api.cache.{ Cache, Cached }
+import scala.concurrent.duration._
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
@@ -37,9 +38,9 @@ object GenesController extends Controller {
     "keywords" -> optional(text))
 
   // POST /genes
-  def listGenesFromForm = Action { implicit request =>
+  def listGenesFromForm = Action.async { implicit request =>
     geneInputForm.bindFromRequest.fold(
-      errors => BadRequest,
+      errors => Future.successful(BadRequest),
       (tuple: GeneFormObject) => {
 
         showGenesHelper(geneSetFromString(tuple.idList), if (tuple.activatorList.isEmpty) List(DMSO, Resting) else tuple.activatorList, if (tuple.infectionList.isEmpty) List(Mock, HIV) else tuple.infectionList)
@@ -47,26 +48,49 @@ object GenesController extends Controller {
       })
   }
 
+  // GET /genespng/:gene
+  def genePNG(list: String) = Action.async { implicit request =>
+    val genes = geneSetFromString(list)
+    showGenesPNG(genes, List(DMSO, CD3, IL7, AZA, DISU, SAHA), List(HIV))
+  }
+
   // GET /genes/:list
-  def listGenes(list: String, activator: String) = Action { implicit request =>
+  def listGenes(list: String, activator: String) = Action.async { implicit request =>
     val genes = geneSetFromString(list)
     showGenesHelper(genes, List(activatorFromString(Some(activator))), List(HIV))
   }
 
-  private def showGenesHelper(genes: Traversable[Gene], activators: List[Activation], infection: List[Infection])(implicit request: Request[_]): Result = {
+  private def showGenesHelper(genes: Traversable[Gene], activators: List[Activation], infection: List[Infection])(implicit request: Request[_]): Future[SimpleResult] = {
     if (genes.size > 0) {
 
       val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => (Resting :: activators).contains(x.activation) && infection.contains(x.infection))
 
       val promiseOfImage = Application.getImageFuture(geneExpressionData, "", cacheResult = false)
-      Async {
-        promiseOfImage.map { (image: String) =>
-          Ok(views.html.showOneGene(genes, Some(image), genes.map(_.name).mkString(" "), bindGenesToForm(genes, activators, infection)))
-        }
 
+      promiseOfImage.map { (image: String) =>
+        Ok(views.html.showOneGene(genes, Some(image), genes.map(_.name).mkString(" "), bindGenesToForm(genes, activators, infection)))
       }
+
     } else {
-      NotFound(views.html.emptyPage())
+      Future.successful(NotFound(views.html.emptyPage()))
+    }
+  }
+
+  private def showGenesPNG(genes: Traversable[Gene], activators: List[Activation], infection: List[Infection])(implicit request: Request[_]): Future[SimpleResult] = {
+    if (genes.size > 0) {
+
+      val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => (Resting :: activators).contains(x.activation) && infection.contains(x.infection))
+
+      val promiseOfImage = Application.getImageFutureBinary(geneExpressionData, "", cacheResult = false)
+
+      model.TimeoutFuture(25 seconds)(promiseOfImage.map {
+        image => Ok(image).as("image/png")
+      }).recover({
+        case _: Throwable => InternalServerError
+      })
+
+    } else {
+      Future.successful { NotFound }
     }
   }
 

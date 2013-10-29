@@ -75,7 +75,10 @@ object Application extends Controller {
     }
   }
 
-  def getImageFuture(genes: Traversable[GeneExpression], name: String, cacheResult: Boolean = true): Future[String] = {
+  def getImageFuture(genes: Traversable[GeneExpression], name: String, cacheResult: Boolean = true) =
+    getImageFutureBinary(genes, name, cacheResult).map(x => DatatypeConverter.printBase64Binary(x))
+
+  def getImageFutureBinary(genes: Traversable[GeneExpression], name: String, cacheResult: Boolean = true): Future[Array[Byte]] = {
     def fun = {
       val factory = DrawableWriterFactory.getInstance();
       val writer = factory.get("image/png");
@@ -83,16 +86,16 @@ object Application extends Controller {
       val bs = new ByteArrayOutputStream()
       writer.write(plot, bs, 900, 300);
 
-      DatatypeConverter.printBase64Binary(bs.toByteArray)
+      bs.toByteArray
     }
 
     if (cacheResult)
       play.api.cache.Cache.get("image-" + name) match {
-        case Some(x) => Promise.pure(x.asInstanceOf[String])
+        case Some(x) => Future.successful(x.asInstanceOf[Array[Byte]])
         case None => {
           val f = (Future(fun))
           f.onSuccess {
-            case (s: String) => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime)
+            case (s: Array[Byte]) => play.api.cache.Cache.set("image-" + name, s, CacheExpiryTime)
           }
           f
         }
@@ -101,7 +104,7 @@ object Application extends Controller {
 
   }
 
-  val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60*168*52)
+  val CacheExpiryTime = current.configuration.getInt("litchi.cacheExpiryInSec").getOrElse(60 * 60 * 168 * 52)
 
 }
 

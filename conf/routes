@@ -19,6 +19,9 @@ GET	/listgenesets 				controllers.GenesController.queryGeneSets
 GET     /genes/:list/activators/:activator              controllers.GenesController.listGenes(list: String,activator:String)
 GET	/genes 						controllers.GenesController.listGenesFromForm
 
+GET     /genepng/:gene              controllers.GenesController.genePNG(gene)
+
+
 # Show a cluster
 GET 	/cluster/:id 			controllers.ClusterController.showCluster(id: String)
 GET 	/cluster 				controllers.ClusterController.showClusterFromForm

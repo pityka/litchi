@@ -30,9 +30,9 @@ object ClusterController extends Controller {
 
   // GET /cluster/
   def showClusterFromForm = Cached(request => request.toString) {
-    Action { implicit request =>
+    Action.async { implicit request =>
       clusterSelectForm.bindFromRequest.fold(
-        errors => { BadRequest },
+        errors => { Future.successful(BadRequest) },
         cluster => {
 
           val (ac1, ac2) = if (cluster._2.isEmpty && cluster._3.isEmpty) {
@@ -44,21 +44,21 @@ object ClusterController extends Controller {
           cl.map(showClusterHelper(_, true,
             ac1,
             ac2
-          )).getOrElse(BadRequest)
+          )).getOrElse(Future.successful(BadRequest))
         })
     }
   }
 
   // GET /cluster/:ID
-  def showCluster(name: String) = Action {
+  def showCluster(name: String) = Action.async {
     val activators = getActivatorsFromClusterName(name)
-    GeneData.geneSetsByName.get(new String8(name)).map(showClusterHelper(_, true, activators.head, activators.drop(1).head)).getOrElse(BadRequest)
+    GeneData.geneSetsByName.get(new String8(name)).map(showClusterHelper(_, true, activators.head, activators.drop(1).head)).getOrElse(Future.successful(BadRequest))
 
   }
 
-  def showGeneSet(name: String) = Action {
+  def showGeneSet(name: String) = Action.async {
     val decodedName = java.net.URLDecoder.decode(name, "utf-8")
-    GeneData.geneSetsByName.get(new String8(decodedName)).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Ok(views.html.emptyPage()))
+    GeneData.geneSetsByName.get(new String8(decodedName)).map(showClusterHelper(_, false, DMSO, DMSO)).getOrElse(Future.successful(Ok(views.html.emptyPage())))
   }
 
   def csvCluster(name: String) = Action {
@@ -70,12 +70,12 @@ object ClusterController extends Controller {
 
     SimpleResult(
       header = ResponseHeader(200, Map("Content-Disposition" -> "attachment; filename=table.txt")),
-      body = play.api.libs.iteratee.Enumerator(renderCSV(genes)))
+      body = play.api.libs.iteratee.Enumerator(renderCSV(genes).getBytes("UTF-8")))
   }
 
   private def renderCSV(genes: Traversable[GeneWithDEG]) = genes.map(g => (List(g.gene.name) ++ g.deg.map(d => List(d.foldChange, d.p, d.pAdj)).getOrElse(Nil)).mkString(",")).mkString("\n")
 
-  private def showClusterHelper(cluster: GeneSet, searchInClusters: Boolean, activator1: Activation, activator2: Activation): Result = {
+  private def showClusterHelper(cluster: GeneSet, searchInClusters: Boolean, activator1: Activation, activator2: Activation): Future[SimpleResult] = {
     val genes = GeneData.genesByCluster(cluster)
 
     val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x.gene)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => List(Resting, activator1, activator2).contains(x.activation) && (x.infection == HIV))
@@ -84,17 +84,14 @@ object ClusterController extends Controller {
       Application.getImageFuture(geneExpressionData, cluster.name + "-" + activator1.toString + "-" + activator2.toString).map(x => Some(x))
 
     } else {
-      Promise.pure(None)
+      scala.concurrent.Future.successful(None)
     }
 
     val enrichmentResults: Vector[EnrichmentResult] = if (searchInClusters) GeneData.enrichmentTestsByClusterName.get(cluster.name).getOrElse(Vector())
     else GeneData.enrichmentTestsByGeneSetName.get(cluster.name).getOrElse(Vector())
 
-    Async {
-      promiseOfImage.map { (image: Option[String]) =>
-        Ok(views.html.showClusterPage(genes, image, cluster.name, enrichmentResults, bindGenesToClusterForm(cluster, activator1, activator2), routes.ClusterController.showClusterFromForm))
-      }
-
+    promiseOfImage.map { (image: Option[String]) =>
+      Ok(views.html.showClusterPage(genes, image, cluster.name, enrichmentResults, bindGenesToClusterForm(cluster, activator1, activator2), routes.ClusterController.showClusterFromForm))
     }
 
   }
