@@ -144,7 +144,7 @@ package object plots {
             case "CD3" => "TCR"
             case x => x
           }.get + " " + ge.infection))
-        }.take(1500), maxY, minY, "Activated", "hours", Location.EAST, 0)
+        }.take(1500), maxY, minY, "Activated - " + title, "hours", Location.EAST, 0)
 
       val restingPlot = createPlot(
         restingData.map { ge =>
@@ -154,7 +154,7 @@ package object plots {
             case x => x
           }.get + " " + ge.infection))
         }.take(1500),
-        maxY, minY, "Resting", "weeks", Location.SOUTH, 3)
+        maxY, minY, "Resting - " + title, "weeks", Location.SOUTH, 3)
 
       restingPlot.setAxis(XYPlot.AXIS_Y, activatedPlot.getAxis(XYPlot.AXIS_Y))
 
