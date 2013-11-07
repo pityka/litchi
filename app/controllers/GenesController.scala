@@ -51,7 +51,7 @@ object GenesController extends Controller {
   // GET /genespng/:gene
   def genePNG(list: String) = Action.async { implicit request =>
     val genes = geneSetFromString(list)
-    showGenesPNG(genes, List(DMSO, CD3, IL7, AZA, DISU, SAHA), List(HIV))
+    showGenesPNG(genes)
   }
 
   // GET /genes/:list
@@ -76,10 +76,19 @@ object GenesController extends Controller {
     }
   }
 
-  private def showGenesPNG(genes: Traversable[Gene], activators: List[Activation], infection: List[Infection])(implicit request: Request[_]): Future[SimpleResult] = {
+  private def showGenesPNG(genes: Traversable[Gene])(implicit request: Request[_]): Future[SimpleResult] = {
     if (genes.size > 0) {
 
-      val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter(x => (Resting :: activators).contains(x.activation) && infection.contains(x.infection))
+      val allactivators = List(DMSO, CD3, IL7, AZA, DISU, SAHA, Resting)
+
+      val geneExpressionData: Vector[GeneExpression] = genes.map(x => GeneData.expressionsByGene.get(x)).filter(_.isDefined).map(_.get).toVector.flatten.filter { geneexpression =>
+        geneexpression match {
+          case x if x.infection == Mock && x.activation == Resting => true
+          case x if allactivators.contains(x.activation) && x.infection == HIV =>
+            true
+          case _ => false
+        }
+      }
 
       val promiseOfImage = Application.getImageFutureBinary(geneExpressionData, genes.head.name.value, cacheResult = false)
 
