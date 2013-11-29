@@ -142,6 +142,7 @@ package object plots {
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
           (col, ge.expression, (Some(ge.activation.toString).map {
             case "CD3" => "TCR"
+            case "Resting" => "Resting CD4"
             case x => x
           }.get + " " + ge.infection))
         }.take(1500), maxY, minY, "Activated - " + title, "hours", Location.EAST, 0)
@@ -151,10 +152,11 @@ package object plots {
           val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
           (col, ge.expression, (Some(ge.activation.toString).map {
             case "CD3" => "TCR"
+            case "Resting" => "Resting CD4"
             case x => x
           }.get + " " + ge.infection))
         }.take(1500),
-        maxY, minY, "Resting - " + title, "weeks", Location.SOUTH, 3)
+        maxY, minY, "Resting CD4 cells - " + title, "weeks", Location.SOUTH, 3)
 
       restingPlot.setAxis(XYPlot.AXIS_Y, activatedPlot.getAxis(XYPlot.AXIS_Y))
 
