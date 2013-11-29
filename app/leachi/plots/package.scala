@@ -116,7 +116,6 @@ package object plots {
         series.filter(_._4.contains("HIV")).foreach {
           case (color, stroke, s, name) =>
             s.setName(name)
-            println(name)
             legend.add(s)
         }
         plotHIV.setSetting(Plot.LEGEND, true)
