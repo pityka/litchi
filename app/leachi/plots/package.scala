@@ -40,30 +40,30 @@ package object plots {
 
   def createTimeLinePlot(geneexpressions: Traversable[GeneExpression], title: String = ""): AbstractDrawable = {
 
-    def createPlot(dat: Traversable[(Color, scala.collection.immutable.List[Spec2], String)], maxY: Double, minY: Double, title: String, timeUnit: String, legendLocation: Location, legendDistance: Double): XYPlot = {
+    def createPlot(dat: Traversable[(Color, Stroke, scala.collection.immutable.List[Spec2], String)], maxY: Double, minY: Double, title: String, timeUnit: String, legendLocation: Location, legendDistance: Double): XYPlot = {
       if (!dat.isEmpty) {
 
         val series = dat.map {
-          case (color, gene, name) =>
+          case (color, stroke, gene, name) =>
             val ser = new DataTable(classOf[java.lang.Double], classOf[java.lang.Double])
             gene.toSeq.sortBy(_._1).filter(_._2 > 0.0).foreach { tuple =>
               ser.add(tuple._1.toDouble, math.log10(tuple._2 + 1.0)) / math.log10(2.0)
             }
 
-            (color, ser, name)
+            (color, stroke, ser, name)
         }
 
-        val maxX = dat.map(_._2).map(x => x.map(_._1).toList).flatten.max
-        val minX = dat.map(_._2).map(x => x.map(_._1).toList).flatten.min
+        val maxX = dat.map(_._3).map(x => x.map(_._1).toList).flatten.max
+        val minX = dat.map(_._3).map(x => x.map(_._1).toList).flatten.min
 
         val plotHIV = new XYPlot()
         plotHIV.setSetting(Plot.AUTOSCALE_AFTER_ADD, false)
         series.foreach {
-          case (color, ser, name) =>
+          case (color, stroke, ser, name) =>
             plotHIV.add(ser)
             val lr = new DefaultLineRenderer2D();
             lr.setSetting(LineRenderer.COLOR, color)
-            lr.setSetting(LineRenderer.STROKE, new BasicStroke(1.5f))
+            lr.setSetting(LineRenderer.STROKE, stroke)
             plotHIV.setLineRenderer(ser, lr)
             plotHIV.setPointRenderer(ser, null);
 
@@ -113,9 +113,10 @@ package object plots {
 
         val legend = plotHIV.getLegend()
         legend.clear()
-        series.groupBy(_._1).mapValues(_.head).values.foreach {
-          case (color, s, name) =>
+        series.filter(_._4.contains("HIV")).foreach {
+          case (color, stroke, s, name) =>
             s.setName(name)
+            println(name)
             legend.add(s)
         }
         plotHIV.setSetting(Plot.LEGEND, true)
@@ -137,20 +138,26 @@ package object plots {
 
       val (restingData, activatedData) = geneexpressions.partition(_.activation == Resting)
 
+      val dashedstroke = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 0.0f, Array[Float](3.0f, 3.0f), 1.0f)
+      val joinedstroke = new BasicStroke(1.5f)
+
       val activatedPlot = createPlot(
         activatedData.map { ge =>
-          val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          (col, ge.expression, (Some(ge.activation.toString).map {
+          val col = if (ge.infection == Mock) ColorMap(ge.activation) else ColorMap(ge.activation)
+          val stroke = if (ge.infection == Mock) dashedstroke else joinedstroke
+          (col, stroke, ge.expression, (Some(ge.activation.toString).map {
             case "CD3" => "TCR"
-            case "Resting" => "Resting CD4"
+            case "Resting" => "Resting CD4+ T cells"
+            case "Activated" => "Reactivated CD4+ T cells"
             case x => x
           }.get + " " + ge.infection))
         }.take(1500), maxY, minY, "Activated - " + title, "hours", Location.EAST, 0)
 
       val restingPlot = createPlot(
         restingData.map { ge =>
-          val col = if (ge.infection == Mock) ColorMap(ge.activation).brighter else ColorMap(ge.activation).darker
-          (col, ge.expression, (Some(ge.activation.toString).map {
+          val col = if (ge.infection == Mock) ColorMap(ge.activation) else ColorMap(ge.activation)
+          val stroke = if (ge.infection == Mock) dashedstroke else joinedstroke
+          (col, stroke, ge.expression, (Some(ge.activation.toString).map {
             case "CD3" => "TCR"
             case "Resting" => "Resting CD4"
             case x => x
