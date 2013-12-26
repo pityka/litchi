@@ -108,14 +108,14 @@ package object plots {
 
         val titlefont = new Font(null, Font.PLAIN, 12)
 
-        plotHIV.setSetting(Plot.TITLE, title.grouped(30).mkString("\n") + " : Gene expression pattern");
+        plotHIV.setSetting(Plot.TITLE, title.grouped(30).mkString("\n"));
         plotHIV.setSetting(Plot.TITLE_FONT, titlefont)
 
         val legend = plotHIV.getLegend()
         legend.clear()
-        series.filter(_._4.contains("HIV")).foreach {
+        series.groupBy(_._4.contains("Mock")).toSeq.sortBy(_._1).head._2.groupBy(x => (x._1, x._2)).map(_._2.head).foreach {
           case (color, stroke, s, name) =>
-            s.setName(name)
+            s.setName(name.replace("HIV", ""))
             legend.add(s)
         }
         plotHIV.setSetting(Plot.LEGEND, true)
