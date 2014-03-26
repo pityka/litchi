@@ -267,10 +267,13 @@ package object leachi {
         GeneSet(name = StringStore(new String(name.dropRight(4))), dataBase = StringStore("diffexp"), set = source.getLines.map { x =>
           val spl = x.split(",")
           val name = spl(0).stripPrefix("\"").stripSuffix("\"")
-          val fold = spl(1).stripPrefix("\"").stripSuffix("\"").toFloat
-          val p = spl(2).stripPrefix("\"").stripSuffix("\"").toFloat
-          val padj = spl(3).stripPrefix("\"").stripSuffix("\"").toFloat
-          GeneWithDEG(Gene.fromIntern(StringStore(name)), Some(DEG(fold, p, padj)))
+          val deg = if (spl.size > 1) {
+            val fold = spl(1).stripPrefix("\"").stripSuffix("\"").toFloat
+            val p = spl(2).stripPrefix("\"").stripSuffix("\"").toFloat
+            val padj = spl(3).stripPrefix("\"").stripSuffix("\"").toFloat
+            Some(DEG(fold, p, padj))
+          } else None
+          GeneWithDEG(Gene.fromIntern(StringStore(name)), deg)
         }.toSet)
     }.toVector
   }

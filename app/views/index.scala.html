@@ -38,7 +38,7 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
     
 <section>
   <div class="row">
-    <div class="span5">
+    <div class="span4">
       @form(routes.Application.compareConditions, 'class->"form-inline") {
           <fieldset>
           <legend>Compare Reactivating Agents</legend>
@@ -59,12 +59,29 @@ Primary CD4+ T cells from healthy blood donors were obtained by negative selecti
       }
     </div>
 
-       <div class="span5">
+       <div class="span4">
       @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
           <fieldset>
           <legend>Compare Infection Conditions</legend>
 
-          @select(clusterForm("clusterName"),clusters.filter(_.name.value.startsWith( "HIVvsMockinLatency")).toSeq.sortBy(_.name).map(x => (x.name.value,x.name.value.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+          @select(clusterForm("clusterName"),clusters.filter(x => x.name.value.startsWith( "HIVvsMockinLatency") || x.name.value.startsWith("Entry") || x.name.value.startsWith("Maintenance")).toSeq.sortBy(_.name).map(x => (x.name.value,x.name.value.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
+
+          <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
+          
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+          </fieldset>
+          
+      }
+    </div>
+
+     <div class="span4">
+      @form(routes.ClusterController.showClusterFromForm, 'class->"form-inline") {
+          <fieldset>
+          <legend>Compare Stages</legend>
+
+          @select(clusterForm("clusterName"),clusters.filter(x => x.name.value.startsWith("Entry") || x.name.value.startsWith("Maintenance")).toSeq.sortBy(_.name).map(x => (x.name.value,x.name.value.toString)).toSeq, '_label -> "",'_showConstraints -> "false") 
 
           <span class="help-block">Paired gene expression tests generate sets of differentially expressed genes (Dn: downregulated, Up: upregulated).</small>
           
