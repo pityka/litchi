@@ -3,7 +3,6 @@ name := "leachi-web"
 version := "1.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
-   "pityu" %% "commons" % "4.1.1" exclude("org.specs2", "specs2_2.10.0-RC1"),
    cache
 )     
 
